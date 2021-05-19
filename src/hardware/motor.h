@@ -135,6 +135,9 @@ class StepperMotor {
         // Sets the coils to hold the motor at the desired phase angle
         void driveCoils(float angle, STEP_DIR direction);
 
+        // Checks if a direction change has occurred. Fixes the offset angle if needed
+        void checkDirectionChange(STEP_DIR currentDirection);
+
         // Sets the state of a coil
         void setCoil(COIL coil, COIL_STATE desiredState, uint16_t current = 0);
 
@@ -167,8 +170,16 @@ class StepperMotor {
         // Variable to keep the desired angle of the motor
         float desiredAngle = 0;
 
-        // Phase angle of the motor (increases in both negative and positive directions)
-        float phaseAngle = 0;
+        // Offset angle of the motor (used to offset the value of the sin and cos functions
+        // This ensures that there is no jump between when the motor moves from forward to reverse)
+        float offsetAngle = 0;
+
+        // Saves the last array index of the sin and cos calculations. This ensures that the transfer between
+        // forward and reverse is smooth
+        uint16_t lastTrigIndex = 0;
+
+        // Saves the last direction of the motor. This is required to detect a change between forward and reverse
+        STEP_DIR lastStepDirection = COUNTER_CLOCKWISE;
 
         // Motor PID controller values
         float pTerm = 0;

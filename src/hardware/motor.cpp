@@ -296,12 +296,12 @@ void StepperMotor::step(STEP_DIR dir, bool useMultiplier, bool updateDesiredAngl
     }
     
     // Add to the phase angle
-    this -> phaseAngle += abs(angleChange);
+    //this -> phaseAngle += abs(angleChange);
     
     // If the phaseAngle is greater than 360, we need to bring it back into range
-    if (this -> phaseAngle >= 360) {
-        phaseAngle -= 360;
-    }
+    //if (this -> phaseAngle >= 360) {
+    //    phaseAngle -= 360;
+    //}
 
     // Check if the angle should be just added to, or actually moved there.
     if (updateDesiredAngle) {
@@ -311,7 +311,7 @@ void StepperMotor::step(STEP_DIR dir, bool useMultiplier, bool updateDesiredAngl
     }
 
     // Drive the coils to their destination
-    this -> driveCoils(phaseAngle, dir);
+    this -> driveCoils(desiredAngle, dir);
 }
 
 
@@ -333,22 +333,54 @@ void StepperMotor::driveCoils(float degAngle, STEP_DIR direction) {
 
     // Calculate the sine and cosine of the angle
     uint16_t arrayIndex = roundedMicrosteps * (MAX_MICROSTEP_DIVISOR / (this -> microstepDivisor));
-    int16_t angleSin = fastSin(arrayIndex);
-    int16_t angleCos = fastCos(arrayIndex);
+    int16_t coilAPercent = 0;
+    int16_t coilBPercent = 0;
 
     // If in reverse, we swap the sign of one of the angles    
     if (direction == PIN) {
-        if ((bool)digitalReadFast(DIRECTION_PIN) != (this -> reversed)) {
-            angleCos = -angleCos;
+        if ((bool)digitalReadFast(DIRECTION_PIN) == (this -> reversed)) {
+
+            // Check to see if we're changing direction
+            checkDirectionChange(COUNTER_CLOCKWISE);
+
+            // Moving in the forward direction (CCW)
+            coilAPercent = fastSin(arrayIndex);
+            coilBPercent = fastCos(arrayIndex);
+            this -> lastStepDirection = COUNTER_CLOCKWISE;
+        }
+        else {
+            // Check to see if we're changing direction
+            checkDirectionChange(CLOCKWISE);
+            
+            // Moving in the reverse direction (CW)
+            coilAPercent = fastCos(arrayIndex);
+            coilBPercent = fastSin(arrayIndex);
+            this -> lastStepDirection = CLOCKWISE;
         }
     }
     else if (direction == CLOCKWISE) {
-        angleCos = -angleCos;
+
+        // Check to see if we're changing direction
+        checkDirectionChange(CLOCKWISE);
+
+        // Moving in the reverse direction (CW)
+        coilAPercent = fastCos(arrayIndex);
+        coilBPercent = fastSin(arrayIndex);
+        this -> lastStepDirection = CLOCKWISE;
+    }
+    else {
+        // Check to see if we're changing direction
+        checkDirectionChange(COUNTER_CLOCKWISE);
+
+        // Moving in the forward direction (CCW)
+        coilAPercent = fastSin(arrayIndex);
+        coilBPercent = fastCos(arrayIndex);
+        this -> lastStepDirection = COUNTER_CLOCKWISE;
     }
 
     // Equation comes out to be (effort * -1 to 1) depending on the sine/cosine of the phase angle
-    int16_t coilAPower = ((int16_t)(this -> peakCurrent) * angleSin) / SINE_MAX;
-    int16_t coilBPower = ((int16_t)(this -> peakCurrent) * angleCos) / SINE_MAX;
+    int16_t coilAPower = ((int16_t)(this -> peakCurrent) * coilAPercent) / SINE_MAX;
+    int16_t coilBPower = ((int16_t)(this -> peakCurrent) * coilBPercent) / SINE_MAX;
 
     // Check the if the coil should be energized to move backward or forward
     if (coilAPower > 0) {
@@ -382,8 +414,28 @@ void StepperMotor::driveCoils(float degAngle, STEP_DIR direction) {
     }
 
     // Save the old values
+    this -> lastTrigIndex = arrayIndex;
     //lastCoilAPower = coilAPower;
     //lastCoilBPower = coilBPower;
+}
+
+
+// Checks if a direction change has occurred. Fixes the offset angle if needed
+void StepperMotor::checkDirectionChange(STEP_DIR currentDirection) {
+
+    // Check if the current direction is different from the past
+    if (currentDirection != lastStepDirection) {
+        // Offset the array index
+        if ((this -> lastTrigIndex) < (SINE_VAL_COUNT / 8) || (this -> lastTrigIndex) > ((5 * SINE_VAL_COUNT) / 8)) {
+
+            // Offset the last index back to the middle
+            this -> offsetAngle = (this -> lastTrigIndex) - (SINE_VAL_COUNT / 8);
+        }
+        else {
+
+        }
+    }
+    
 }
 
 
