@@ -1,8 +1,8 @@
-// Import the config (needed for the USE_SERIAL or USE_CAN defines)
+// Import the config (needed for the ENABLE_SERIAL or ENABLE_CAN defines)
 #include "config.h"
 
 // Only include if the serial or CAN bus is enabled
-#if defined(USE_SERIAL) || defined(USE_CAN)
+#if defined(ENABLE_SERIAL) || defined(ENABLE_CAN)
 
 #include "parser.h"
 
@@ -116,7 +116,7 @@ String parseString(String buffer) {
             case 356:
 
                 // Only build in functionality if specified
-                #ifdef USE_CAN
+                #ifdef ENABLE_CAN
                     // M356 (ex M356 V1 or M356 VX2) - Sets the CAN ID of the board. Can be set using the axis character or actual ID.
                     if (parseValue(buffer, 'V').toInt() == 0) {
 
@@ -211,8 +211,10 @@ String parseString(String buffer) {
 
             case 907:
                 // M907 (ex M907 R3000 or M907 P3000) - Sets the RMS or Peak current in mA
-                motor.setRMSCurrent(parseValue(buffer, 'V').toInt());
-                motor.setPeakCurrent(parseValue(buffer, 'P').toInt());
+                #ifndef ENABLE_DYNAMIC_CURRENT
+                    motor.setRMSCurrent(parseValue(buffer, 'V').toInt());
+                    motor.setPeakCurrent(parseValue(buffer, 'P').toInt());
+                #endif
                 return FEEDBACK_OK;
 
         }
@@ -250,4 +252,4 @@ String parseValue(String buffer, char letter) {
     }
 }
 
-#endif // (USE_SERIAL || USE_CAN)
+#endif // (ENABLE_SERIAL || ENABLE_CAN)

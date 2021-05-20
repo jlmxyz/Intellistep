@@ -14,6 +14,7 @@ GPIO_InitTypeDef GPIO_InitStructure;
 
 // Moving average instances
 MovingAverage <float> encoderSpeedAvg;
+MovingAverage <float> encoderAccelAvg;
 MovingAverage <float> encoderAngleAvg;
 MovingAverage <float> encoderAbsoluteAngleAvg;
 MovingAverage <float> encoderTempAvg;
@@ -179,6 +180,7 @@ void initEncoder() {
 
     // Setup the moving average calculations
     encoderSpeedAvg.begin(RPM_AVG_READINGS);
+    encoderAccelAvg.begin(ACCEL_AVG_READINGS);
     encoderAngleAvg.begin(ANGLE_AVG_READINGS);
     encoderAbsoluteAngleAvg.begin(ANGLE_AVG_READINGS);
     encoderTempAvg.begin(TEMP_AVG_READINGS);
@@ -444,6 +446,30 @@ double getEncoderSpeed() {
 }
 
 #endif // ! ENCODER_ESTIMATION
+
+
+// Calculates the angular acceleration. Done by looking at position over time^2
+double getEncoderAccel() {
+
+    // Get the newest angle
+    double newAngle = getAbsoluteAngle();
+
+    // Sample time
+    uint32_t currentTime = micros();
+
+    // Compute the average velocity (extra pow at beginning is needed to convert microseconds to seconds)
+    double avgAccel = (newAngle - lastEncoderAngle) / pow(1000000 * (currentTime - lastAngleSampleTime), 2);
+
+    // Correct the last angle and sample time
+    lastEncoderAngle = newAngle;
+    lastAngleSampleTime = currentTime;
+
+    // Add the value to the averaging list
+    encoderAccelAvg.add(avgAccel);
+
+    // Return the averaged velocity
+    return encoderAccelAvg.get();
+}
 
 // Reads the temperature of the encoder
 double getEncoderTemp() {

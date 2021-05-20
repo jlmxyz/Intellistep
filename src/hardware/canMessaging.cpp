@@ -1,8 +1,8 @@
-// Import the config (needed for the USE_CAN define)
+// Import the config (needed for the ENABLE_CAN define)
 #include "config.h"
 
 // Only build the file if needed
-#ifdef USE_CAN
+#ifdef ENABLE_CAN
 
 // The local header file
 #include "canMessaging.h"
@@ -98,4 +98,4 @@ AXIS_CAN_ID getCANID() {
     return canID;
 }
 
-#endif // ! USE_CAN
+#endif // ! ENABLE_CAN

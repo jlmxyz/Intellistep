@@ -17,26 +17,38 @@
 #define FIRMWARE_FEATURE_HEADER  (String("Enabled features:\n"))
 
 // Firmware feature print definition
-#ifdef USE_OLED
+#ifdef ENABLE_OLED
     #define FIRMWARE_FEATURE_OLED     String("OLED\n")
 #else
     #define FIRMWARE_FEATURE_OLED     String("")
 #endif
 
-#ifdef USE_SERIAL
+#ifdef ENABLE_SERIAL
     #define FIRMWARE_FEATURE_SERIAL    String("Serial\n")
 #else
     #define FIRMWARE_FEATURE_SERIAL    String("")
 #endif
 
-#ifdef USE_CAN
+#ifdef ENABLE_CAN
     #define FIRMWARE_FEATURE_CAN    String("CAN\n")
 #else
     #define FIRMWARE_FEATURE_CAN    String("")
 #endif
 
+#ifdef ENABLE_STALLFAULT
+    #define FIRMWARE_FEATURE_STALLFAULT    String("StallFault\n")
+#else
+    #define FIRMWARE_FEATURE_STALLFAULT    String("")
+#endif
+
+#ifdef ENABLE_DYNAMIC_CURRENT
+    #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    String("Dynamic Current\n")
+#else
+    #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    String("")
+#endif
+
 // Main firmware print string
-#define FIRMWARE_FEATURE_PRINT (FIRMWARE_FEATURE_VERSION + FIRMWARE_FEATURE_HEADER + FIRMWARE_FEATURE_OLED + FIRMWARE_FEATURE_SERIAL + FIRMWARE_FEATURE_CAN)
+#define FIRMWARE_FEATURE_PRINT (FIRMWARE_FEATURE_VERSION + FIRMWARE_FEATURE_HEADER + FIRMWARE_FEATURE_OLED + FIRMWARE_FEATURE_SERIAL + FIRMWARE_FEATURE_CAN + FIRMWARE_FEATURE_STALLFAULT + FIRMWARE_FEATURE_DYNAMIC_CURRENT)
 
 // Parse a string for commands, returning the feedback on the command
 String parseString(String buffer);

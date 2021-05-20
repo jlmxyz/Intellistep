@@ -244,6 +244,7 @@ void setBitField(BitField_t bitfield, uint16_t bitFNewValue);
 uint16_t readEncoderState();
 double getAngle(bool average = true);
 double getEncoderSpeed();
+double getEncoderAccel();
 double getEncoderTemp();
 double getAbsoluteRev();
 double getAbsoluteAngle();

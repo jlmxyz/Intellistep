@@ -198,10 +198,17 @@ class StepperMotor {
         float rateError;
 
         // Motor characteristics
-        // RMS Current (in mA)
-        uint16_t rmsCurrent = 750;
-        // Peak Current (in mA)
-        uint16_t peakCurrent = (rmsCurrent * 1.414);
+        #ifdef ENABLE_DYNAMIC_CURRENT
+            // Dynamic current settings
+            uint16_t dynamicAccelCurrent = DYNAMIC_ACCEL_CURRENT;
+            uint16_t dynamicIdleCurrent = DYNAMIC_IDLE_CURRENT;
+            uint16_t dynamicMaxCurrent = DYNAMIC_MAX_CURRENT;
+        #else
+            // RMS Current (in mA)
+            uint16_t rmsCurrent = STATIC_RMS_CURRENT;
+            // Peak Current (in mA)
+            uint16_t peakCurrent = (rmsCurrent * 1.414);
+        #endif
 
         // Microstepping divisor
         uint16_t microstepDivisor = 1;

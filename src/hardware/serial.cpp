@@ -2,7 +2,7 @@
 #include "config.h"
 
 // Only build if specified
-#ifdef USE_SERIAL
+#ifdef ENABLE_SERIAL
 
 // Import the header file
 #include "serial.h"
@@ -93,4 +93,4 @@ void runSerialParser() {
     }
 }
 
-#endif // ! USE_SERIAL
+#endif // ! ENABLE_SERIAL

@@ -114,6 +114,7 @@ void StepperMotor::setDValue(float newD) {
 }
 
 
+#ifndef ENABLE_DYNAMIC_CURRENT
 // Gets the RMS current of the motor (in mA)
 uint16_t StepperMotor::getRMSCurrent() const {
     return (this -> rmsCurrent);
@@ -133,10 +134,10 @@ void StepperMotor::setRMSCurrent(uint16_t rmsCurrent) {
     if (rmsCurrent != -1) {
 
         // Make sure that the RMS current is within the current bounds of the motor, if so set it
-        this -> rmsCurrent = constrain(rmsCurrent, 0, (uint16_t)MAX_RMS_CURRENT);
+        this -> rmsCurrent = constrain(rmsCurrent, 0, (uint16_t)MAX_RMS_BOARD_CURRENT);
 
         // Also set the peak current
-        this -> peakCurrent = constrain((uint16_t)(rmsCurrent * 1.414), 0, (uint16_t)MAX_PEAK_CURRENT);
+        this -> peakCurrent = constrain((uint16_t)(rmsCurrent * 1.414), 0, (uint16_t)MAX_PEAK_BOARD_CURRENT);
     }
 }
 
@@ -148,13 +149,13 @@ void StepperMotor::setPeakCurrent(uint16_t peakCurrent) {
     if (peakCurrent != -1) {
 
         // Make sure that the peak current is within the current bounds of the motor, if so set it
-        this -> peakCurrent = constrain(peakCurrent, 0, (uint16_t)MAX_PEAK_CURRENT);
+        this -> peakCurrent = constrain(peakCurrent, 0, (uint16_t)MAX_PEAK_BOARD_CURRENT);
 
         // Also set the RMS current
-        this -> rmsCurrent = constrain((uint16_t)(peakCurrent * 0.707), 0, (uint16_t)MAX_RMS_CURRENT);
+        this -> rmsCurrent = constrain((uint16_t)(peakCurrent * 0.707), 0, (uint16_t)MAX_RMS_BOARD_CURRENT);
     }
 }
-
+#endif
 
 // Get the microstepping divisor of the motor
 uint16_t StepperMotor::getMicrostepping() const {
@@ -379,8 +380,19 @@ void StepperMotor::driveCoils(float degAngle, STEP_DIR direction) {
     }
 
     // Equation comes out to be (effort * -1 to 1) depending on the sine/cosine of the phase angle
-    int16_t coilAPower = ((int16_t)(this -> peakCurrent) * coilAPercent) / SINE_MAX;
-    int16_t coilBPower = ((int16_t)(this -> peakCurrent) * coilBPercent) / SINE_MAX;
+    #ifdef ENABLE_DYNAMIC_CURRENT
+
+        // Get the current acceleration
+        double angAccel = getEncoderAccel();
+
+        // Compute the coil power
+        int16_t coilAPower = ((int16_t)(((angAccel * (this -> dynamicAccelCurrent)) + (this -> dynamicIdleCurrent)) * 1.414) * coilAPercent) / SINE_MAX;
+        int16_t coilBPower = ((int16_t)(((angAccel * (this -> dynamicAccelCurrent)) + (this -> dynamicIdleCurrent)) * 1.414) * coilBPercent) / SINE_MAX;
+    #else
+        // Just use static current multipiers
+        int16_t coilAPower = ((int16_t)(this -> peakCurrent) * coilAPercent) / SINE_MAX;
+        int16_t coilBPower = ((int16_t)(this -> peakCurrent) * coilBPercent) / SINE_MAX;
+    #endif
 
     // Check the if the coil should be energized to move backward or forward
     if (coilAPower > 0) {
@@ -582,7 +594,7 @@ void StepperMotor::calibrate() {
     // ! Write yet
 
     // Only include if specified
-    #ifdef USE_OLED
+    #ifdef ENABLE_OLED
 
         // Display that calibration is coming soon
         clearOLED();

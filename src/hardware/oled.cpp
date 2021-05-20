@@ -1,8 +1,8 @@
-// Import the config (nedeed for the USE_OLED define)
+// Import the config (nedeed for the ENABLE_OLED define)
 #include "config.h"
 
 // Only build if needed
-#ifdef USE_OLED
+#ifdef ENABLE_OLED
 
 // Import libraries
 #include "oled.h"
@@ -71,7 +71,7 @@ void updateDisplay() {
                     clearOLED();
 
                     // Constrain the current setting within 0 and the maximum current
-                    if (currentCursorIndex > (uint16_t)MAX_RMS_CURRENT / 100) {
+                    if (currentCursorIndex > (uint16_t)MAX_RMS_BOARD_CURRENT / 100) {
 
                         // Loop back to the start of the list
                         currentCursorIndex = 0;
@@ -84,7 +84,7 @@ void updateDisplay() {
                     for (uint8_t stringIndex = 0; stringIndex <= 3; stringIndex++) {
 
                         // Check to make sure that the current isn't out of range of the max current
-                        if ((currentCursorIndex + stringIndex) * 100 <= (uint16_t)MAX_RMS_CURRENT) {
+                        if ((currentCursorIndex + stringIndex) * 100 <= (uint16_t)MAX_RMS_BOARD_CURRENT) {
 
                             // Value is in range, display the current on that line
                             writeOLEDString(25, stringIndex * 16, String((int) ((currentCursorIndex + stringIndex) * 100)) + String("mA"), false);
@@ -261,7 +261,9 @@ void selectMenuItem() {
 
             case CURRENT:
                 // Motor mAs. Need to get the current motor mAs, then convert that to a cursor value
-                currentCursorIndex = constrain(round(motor.getRMSCurrent() / 100), 0, (uint16_t)MAX_RMS_CURRENT);
+                #ifndef ENABLE_DYNAMIC_CURRENT
+                    currentCursorIndex = constrain(round(motor.getRMSCurrent() / 100), 0, (uint16_t)MAX_RMS_BOARD_CURRENT);
+                #endif
 
                 // Enter the menu
                 menuDepth = SUBMENUS;
@@ -325,7 +327,7 @@ void selectMenuItem() {
                 uint8_t rmsCurrentSetting = 100 * currentCursorIndex;
 
                 // Check to see if the warning needs flagged
-                if (rmsCurrentSetting % (uint16_t)MAX_RMS_CURRENT >= (uint16_t)WARNING_RMS_CURRENT) {
+                if (rmsCurrentSetting % (uint16_t)MAX_RMS_BOARD_CURRENT >= (uint16_t)WARNING_RMS_CURRENT) {
 
                     // Set the display to output the warning
                     menuDepth = WARNING;
@@ -335,7 +337,9 @@ void selectMenuItem() {
                 }
                 else {
                     // Set the value
-                    motor.setRMSCurrent(rmsCurrentSetting % (uint16_t)MAX_RMS_CURRENT);
+                    #ifndef ENABLE_DYNAMIC_CURRENT
+                        motor.setRMSCurrent(rmsCurrentSetting % (uint16_t)MAX_RMS_BOARD_CURRENT);
+                    #endif
                     
                     // Exit the menu
                     menuDepth = MENU_RETURN_LEVEL;
@@ -418,7 +422,9 @@ void selectMenuItem() {
             case CURRENT:
 
                 // Calculate the setting from the cursor index
-                motor.setRMSCurrent((100 * currentCursorIndex) % (uint16_t)MAX_RMS_CURRENT);
+                #ifndef ENABLE_DYNAMIC_CURRENT
+                    motor.setRMSCurrent((100 * currentCursorIndex) % (uint16_t)MAX_RMS_BOARD_CURRENT);
+                #endif
 
             // Need to set the microstep
             case MICROSTEP:
@@ -849,4 +855,4 @@ void writeOLEDString(uint8_t x, uint8_t y, String string, bool updateScreen) {
     writeOLEDString(x, y, string.c_str(), updateScreen);
 }
 
-#endif // ! USE_OLED
+#endif // ! ENABLE_OLED

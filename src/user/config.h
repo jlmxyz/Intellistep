@@ -5,18 +5,19 @@
 #include "Arduino.h"
 
 // Version of the firmware (displayed on OLED) (follows semantic versioning)
-#define VERSION "0.0.14"
+#define VERSION "0.0.15"
 
 
 // --------------  Settings  --------------
 
 // Main feature enable
-#define USE_OLED
-#define USE_SERIAL
-//#define USE_CAN
+#define ENABLE_OLED
+#define ENABLE_SERIAL
+//#define ENABLE_CAN
 
 // Averages (number of readings in average)
 #define RPM_AVG_READINGS     10
+#define ACCEL_AVG_READINGS   10
 #define ANGLE_AVG_READINGS   15
 #define TEMP_AVG_READINGS    100
 
@@ -27,7 +28,7 @@
 #endif
 
 // Serial configuration settings
-#ifdef USE_SERIAL
+#ifdef ENABLE_SERIAL
     #define STRING_START_MARKER '<'
     #define STRING_END_MARKER '>'
     #define SERIAL_BAUD 115200
@@ -38,7 +39,7 @@
 // Y:7, Y2:8... 
 // Z:11 Z2:12...
 // E:17, E1:18...
-#ifdef USE_CAN
+#ifdef ENABLE_CAN
     #define DEFAULT_CAN_ID X
 #endif
 
@@ -51,18 +52,40 @@
 // ! Do not modify unless you know what you are doing!
 #define BOARD_VOLTAGE           3.3 // The voltage of the main processor
 #define CURRENT_SENSE_RESISTOR  0.2 // Value of the board's current calculation resistor. An incorrect value here will cause current inaccuracies
+#define MAX_PEAK_BOARD_CURRENT  3500 // Maximum peak current in mA that the board can manage
 
 // Motor settings
-#define MAX_PEAK_CURRENT        3500 // Maximum peak current in mA
+//#define ENABLE_DYNAMIC_CURRENT
+#ifdef ENABLE_DYNAMIC_CURRENT
+    // A dynamically controller current loop. Uses the equation: accel * accelCurrent + idleCurrent
+    // Limited by the max dynamic current, which will limit the maximum that the dynamic loop can output
+    // All current values are in RMS
+    #define DYNAMIC_ACCEL_CURRENT 10 // Multiplied by deg/s/s, in mA
+    #define DYNAMIC_IDLE_CURRENT  500 // In mA
+    #define DYNAMIC_MAX_CURRENT   750 // In mA
+#else
+    // Classic, static current
+    #define STATIC_RMS_CURRENT     750 // This is the rating of the motor from the manufacturer
+#endif
 #define MIN_MICROSTEP_DIVISOR   1 // The minimum microstepping divisor
 #define MAX_MICROSTEP_DIVISOR   32 // The maximum microstepping divisor
-#define STEP_FAULT_TIME         1 // The maximum allowable time (sec) for a step fault (meaning motor is out of position)
-#define STEP_FAULT_ANGLE        45 // The maximum allowable deviation between the actual and set angles before StallFault is triggered
-#define IDLE_MODE               COAST // The mode to set the motor to when it's disabled
 #define MOTOR_PWM_FREQ          50 // in kHz
+#define IDLE_MODE               COAST // The mode to set the motor to when it's disabled
+
+// Stallfault
+//#define ENABLE_STALLFAULT
+#ifdef ENABLE_STALLFAULT
+    #define STEP_FAULT_TIME         1 // The maximum allowable time (sec) for a step fault (meaning motor is out of position)
+    #define STEP_FAULT_ANGLE        45 // The maximum allowable deviation between the actual and set angles before StallFault is triggered
+
+    // StallFault connection (to mainboard)
+    // Pulls high on a stepper misalignment after the set period
+    // ! Find an actual pin to set
+    #define STALLFAULT_PIN  NC
+#endif
 
 // Button settings
-#ifdef USE_OLED
+#ifdef ENABLE_OLED
     #define BUTTON_REPEAT_INTERVAL 250 // Millis
     #define MENU_RETURN_LEVEL MOTOR_DATA // The level to return to after configuring a setting
     #define WARNING_MICROSTEP 32 // The largest microstep to warn on (the denominator of the fraction)
@@ -165,11 +188,6 @@ static const PinName COIL_POWER_OUTPUT_PINS[]    =  { PB_5, PB_4 };
 // CAN bus pins
 #define CAN_IN_PIN   PA_11
 #define CAN_OUT_PIN  PA_12
-
-// StallFault connection (to mainboard)
-// Pulls high on a stepper misalignment after the set period
-// ! Find an actual pin to set
-#define STALLFAULT_PIN  NC
 
 
 // --------------  Internal defines  --------------

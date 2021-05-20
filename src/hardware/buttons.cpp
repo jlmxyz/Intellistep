@@ -1,4 +1,4 @@
-// Import the config (needed for the USE_OLED define)
+// Import the config (needed for the ENABLE_OLED define)
 #include "config.h"
 
 // Imports
@@ -16,7 +16,7 @@ uint32_t lastButtonClickTime = 0;
 void initButtons() {
 
   // Only build if specified
-  #ifdef USE_OLED
+  #ifdef ENABLE_OLED
 
     // Down pin (moves the menu down)
     pinMode(DOWN_BUTTON_PIN, INPUT_PULLUP);
@@ -39,7 +39,7 @@ void initButtons() {
 }
 
 // Only include button code if using the OLED panel
-#ifdef USE_OLED
+#ifdef ENABLE_OLED
 
 // Scan each of the buttons
 void checkButtons(bool updateScreen) {
@@ -108,7 +108,7 @@ bool checkButtonState(PinName buttonPin) {
     return false;
   }
 }
-#endif // ! USE_OLED
+#endif // ! ENABLE_OLED
 
 // Function for reading the microstepping set via the dip switches
 void readDipMicrostepping() {
