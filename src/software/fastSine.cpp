@@ -40,3 +40,34 @@ int16_t fastCos(uint16_t angle) {
     // Return the value in the table
 	return sineTable[angle];
 }
+
+
+// Reverse sin lookup (backward)
+int16_t sinLookup(int16_t sinValue, ARRAY_SCAN_DIR direction) {
+
+    // First decide which direction to approach the array from
+    if (direction == FRONT) {
+
+        // Loop through the values, starting at index 0 and counting to the length of the index
+        for (uint8_t counter = 0; counter < (sizeof(sineTable) / sizeof(sineTable[0])); counter++) {
+
+            // Check if the value matches, if so return
+            if (sinValue == sineTable[counter]) {
+                return counter;
+            }
+        }
+    }
+    else {
+        // Loop through the values, starting at the length of the index and counting down
+        for (uint8_t counter = (sizeof(sineTable) / sizeof(sineTable[0])); counter >= 0; counter--) {
+
+            // Check if the value matches, if so return
+            if (sinValue == sineTable[counter]) {
+                return counter;
+            }
+        }
+    }
+
+    // If we made it this far, there isn't a value. Return -1
+    return -1;
+}

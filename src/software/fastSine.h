@@ -10,8 +10,15 @@
 // Public variables
 //extern float sineValues[];
 
+// Array direction enum
+typedef enum {
+    FRONT,
+    BACK
+} ARRAY_SCAN_DIR;
+
 // Main functions
 int16_t fastSin(uint16_t angle);
 int16_t fastCos(uint16_t angle);
+int16_t sinLookup(int16_t sinValue, ARRAY_SCAN_DIR direction);
 
 #endif // !__FAST_SINE_H__

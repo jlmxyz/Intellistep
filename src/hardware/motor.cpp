@@ -398,12 +398,12 @@ void StepperMotor::driveCoils(float degAngle, STEP_DIR direction) {
     if (coilAPower > 0) {
 
         // Set first channel for forward movement
-        setCoil(A, FORWARD, coilAPower);
+        setCoil(A, COIL_STATE::FORWARD, coilAPower);
     }
     else if (coilAPower < 0) {
 
         // Set first channel for backward movement
-        setCoil(A, BACKWARD, -coilAPower);
+        setCoil(A, COIL_STATE::BACKWARD, -coilAPower);
     }
     else {
         setCoil(A, BRAKE);
@@ -414,7 +414,7 @@ void StepperMotor::driveCoils(float degAngle, STEP_DIR direction) {
     if (coilBPower > 0) {
 
         // Set first channel for forward movement
-        setCoil(B, FORWARD, coilBPower);
+        setCoil(B, COIL_STATE::FORWARD, coilBPower);
     }
     else if (coilBPower < 0) {
 
@@ -437,15 +437,32 @@ void StepperMotor::checkDirectionChange(STEP_DIR currentDirection) {
 
     // Check if the current direction is different from the past
     if (currentDirection != lastStepDirection) {
-        // Offset the array index
-        if ((this -> lastTrigIndex) < (SINE_VAL_COUNT / 8) || (this -> lastTrigIndex) > ((5 * SINE_VAL_COUNT) / 8)) {
 
-            // Offset the last index back to the middle
-            this -> offsetAngle = (this -> lastTrigIndex) - (SINE_VAL_COUNT / 8);
+        // Create a boolean for deciding the direction to approach the array
+        ARRAY_SCAN_DIR direction;
+
+        // Decide which direction to approach from
+        if ((this -> lastTrigIndex) > (SINE_VAL_COUNT / 2)) {
+            // Check to see if we need to approach the array from front or back
+            if (this -> lastTrigIndex < SINE_VAL_COUNT / 4) {
+                direction = ARRAY_SCAN_DIR::FRONT;
+            }
+            else {
+                direction = ARRAY_SCAN_DIR::BACK;
+            }
         }
         else {
-
+            // Check to see if we need to approach the array from the front or back
+            if (this -> lastTrigIndex < (3 * SINE_VAL_COUNT) / 4) {
+                direction = ARRAY_SCAN_DIR::FRONT;
+            }
+            else {
+                direction = ARRAY_SCAN_DIR::BACK;
+            }
         }
+        
+        // Set the offset
+        this -> offsetAngle = sinLookup(fastCos(this -> lastTrigIndex), direction);
     }
     
 }
