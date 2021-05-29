@@ -13,7 +13,7 @@
 // Main feature enable
 #define ENABLE_OLED
 #define ENABLE_SERIAL
-//#define ENABLE_CAN
+#define ENABLE_CAN
 
 // Averages (number of readings in average)
 #define RPM_AVG_READINGS     10
@@ -41,6 +41,7 @@
 // E:17, E1:18...
 #ifdef ENABLE_CAN
     #define DEFAULT_CAN_ID X
+    #define CAN_BITRATE BR125K
 #endif
 
 // Motor characteristics

@@ -61,6 +61,13 @@ String parseString(String buffer) {
                 // M115 (ex M115) - Prints out firmware information.
                 return FIRMWARE_FEATURE_PRINT;
 
+            #ifdef ENABLE_CAN
+            case 116:
+                // M116 (ex M116 S1) - Simple ping command that will send a message back to the sender. 
+                // S value should be the CAN ID of the sender. If S is -1, then 
+                txCANString(parseValue(buffer, 'S').toInt(), "ok");
+            #endif
+
             case 306:
                 // M306 (ex M306 P1 I1 D1) - Sets the PID values for the motor
                 motor.setPValue(parseValue(buffer, 'P').toFloat());
