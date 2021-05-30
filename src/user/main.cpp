@@ -31,7 +31,7 @@ void setup() {
     initEncoder();
 
     // Setup the motor for use
-    motor.enable(true);
+    motor.setState(DISABLED, true);
     //motor.setMicrostepping(16);
     //motor.setDesiredAngle(100);
 

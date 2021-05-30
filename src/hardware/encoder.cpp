@@ -504,12 +504,31 @@ double getEncoderTemp() {
     // Calculate the new temperature
     double temp = encoderTempAvg.get();
 
+    // Only compile if overtemp protection is enabled
+    #ifdef ENABLE_OVERTEMP_PROTECTION
+
+    // Check to see if there was a overtemp disable
+    if (motor.getState() == MOTOR_STATE::OVERTEMP) {
+
+        // There was an overtemp previously, check if it should be cleared
+        if (temp < OVERTEMP_SHUTDOWN_CLEAR_TEMP) {
+            motor.setState(DISABLED, true);
+        }
+    }
+
     // If overtemp protection is enabled, we should check it now
-    if (temp >= OVERTEMP_THRESHOLD) {
+    else if (temp >= OVERTEMP_THRESHOLD_TEMP) {
+
+        // Check if the motor needs to be overtemp disabled
+        if (temp >= OVERTEMP_SHUTDOWN_TEMP) {
+
+            // Disable the motor with an overtemp
+            motor.setState(OVERTEMP);
+        }
 
         // Value is too high, we might need to reduce it
         // Make sure that the last time increment is far enough behind
-        if (sec() - lastOvertempTime >= OVERTEMP_INTERVAL) {
+        else if (sec() - lastOvertempTime >= OVERTEMP_INTERVAL) {
 
             // Make sure that the process won't get interrupted
             disableInterrupts();
@@ -524,6 +543,8 @@ double getEncoderTemp() {
             enableInterrupts();
         }
     }
+
+    #endif // ENABLE_OVERTEMP_PROTECTION
     
     // Return the temperature
     return temp;

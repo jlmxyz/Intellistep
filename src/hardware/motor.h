@@ -40,6 +40,10 @@ typedef enum {
     ENABLED,
     DISABLED,
     FORCED_DISABLED
+
+    #ifdef ENABLE_OVERTEMP_PROTECTION
+    , OVERTEMP
+    #endif
 } MOTOR_STATE;
 
 // Stepper motor class (defined to make life a bit easier when dealing with the motor)
@@ -146,12 +150,12 @@ class StepperMotor {
 
         // Sets the speed of the motor (angular speed is in deg/s)
         float speedToHz(float angularSpeed) const;
+        
+        // Sets the current state of the motor
+        void setState(MOTOR_STATE newState, bool clearErrors = false);
 
-        // Enables the coils, preventing motor movement
-        void enable(bool clearForcedDisable = false);
-
-        // Releases the coils, allowing the motor to freewheel. The forced disable will cause it to ignore the enabled pin
-        void disable(bool forcedDisable = false);
+        // Get the current state of the motor
+        MOTOR_STATE getState() const;
 
         // Computes the next speed of the motor
         float compute(float feedback);

@@ -28,7 +28,7 @@ StepperMotor::StepperMotor(float P, float I, float D) {
     analogWriteFrequency(MOTOR_PWM_FREQ * 1000);
 
     // Disable the motor
-    disable();
+    disable(DISABLED);
 }
 
 // Constructor without PID terms
@@ -50,7 +50,7 @@ StepperMotor::StepperMotor() {
     analogWriteFrequency(MOTOR_PWM_FREQ * 1000);
 
     // Disable the motor
-    disable();
+    disable(DISABLED);
 }
 
 
@@ -526,15 +526,10 @@ float StepperMotor::speedToHz(float angularSpeed) const {
 
 
 // Enables the motor, powering the coils
-void StepperMotor::enable(bool clearForcedDisable) {
+void StepperMotor::enable(MOTOR_STATE stateToClear) {
 
     // Clear the forced disable if needed
-    if (clearForcedDisable && ((this -> state) == FORCED_DISABLED)) {
-        this -> state = DISABLED;
-    }
-
-    // Check if the motor is enabled yet. No need to set all of the coils if they're already set
-    if ((this -> state) == DISABLED) {
+    if ((this -> state) == stateToClear) {
 
         // Mod the current angle by total phase angle to estimate the phase angle of the motor, then set the coils to the current position
         this -> driveCoils(0, COUNTER_CLOCKWISE);
@@ -546,10 +541,10 @@ void StepperMotor::enable(bool clearForcedDisable) {
 
 
 // Disables the motor, freeing the coils
-void StepperMotor::disable(bool forceDisable) {
+void StepperMotor::disable(MOTOR_STATE newState) {
 
     // Check if the motor is not enabled yet. No need to disable the coils if they're already off
-    if ((this -> state) == ENABLED) {
+    if ((this -> state) == ENABLED && newState != ENABLED) {
 
         // Set the A driver to whatever disable mode was set
         setCoil(A, IDLE_MODE);
@@ -557,16 +552,17 @@ void StepperMotor::disable(bool forceDisable) {
         // Set the B driver to whatever disable mode was set
         setCoil(B, IDLE_MODE);
 
-        // Set the state to disabled (forced if specified)
-        if (forceDisable) {
-            this -> state = FORCED_DISABLED;
-        }
-        else {
-            this -> state = DISABLED;
-        }
-        
+        // Set the state to the specified
+        this -> state = newState;
     }
 }
+
+
+// Return the state of the motor
+MOTOR_STATE StepperMotor::getState() const {
+    return (this -> state);
+}
+
 
 /*
 // Computes the speed of the motor

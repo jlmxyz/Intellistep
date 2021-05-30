@@ -72,7 +72,7 @@ void updateMotor() {
     if (digitalRead(ENABLE_PIN) == motor.getEnableInversion()) {
 
         // The enable pin is off, the motor should be disabled
-        motor.disable();
+        motor.setState(DISABLED);
 
         // Only include if StallFault is enabled
         #ifdef ENABLE_STALLFAULT
@@ -89,7 +89,7 @@ void updateMotor() {
     else {
 
         // Enable the motor if it's not already (just energizes the coils to hold it in position)
-        motor.enable();
+        motor.setState(ENABLED);
 
         // Get the current angle of the motor (multiple reads take a longer time)
         double currentAngle = getAbsoluteAngle();
