@@ -11,6 +11,11 @@ HardwareTimer *steppingTimer = new HardwareTimer(TIM1);
 uint16_t outOfPosCount = 0;
 
 
+// Tiny little function, just gets the time that the current program has been running
+uint32_t sec() {
+    return (millis() / 1000);
+}
+
 // Sets up the motor update timer
 void setupMotorTimers() {
 

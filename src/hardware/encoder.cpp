@@ -1,5 +1,8 @@
 #include "encoder.h"
 
+// Include timers.h here so there isn't a linking circle
+#include "timers.h"
+
 // SPI init structure
 SPI_HandleTypeDef spiConfig;
 
@@ -10,6 +13,11 @@ GPIO_InitTypeDef GPIO_InitStructure;
 #ifdef ENCODER_SPEED_ESTIMATION
     double lastEncoderAngle = 0;
     uint32_t lastAngleSampleTime = 0;
+#endif
+
+// Storage for the last overtemp time
+#ifdef ENABLE_OVERTEMP_PROTECTION
+    uint32_t lastOvertempTime = 0;
 #endif
 
 // Moving average instances
@@ -198,6 +206,11 @@ void initEncoder() {
     #ifdef ENCODER_SPEED_ESTIMATION
         lastEncoderAngle = getAbsoluteAngle();
         lastAngleSampleTime = micros();
+    #endif
+
+    // Set the correct start time for the overtemp protection
+    #ifdef ENABLE_OVERTEMP_PROTECTION
+        lastOvertempTime = sec();
     #endif
 }
 
@@ -487,7 +500,33 @@ double getEncoderTemp() {
 
     // Return the value (equation from TLE5012 library)
 	encoderTempAvg.add(((int16_t)rawData + TEMP_OFFSET) / (TEMP_DIV));
-    return encoderTempAvg.get();
+
+    // Calculate the new temperature
+    double temp = encoderTempAvg.get();
+
+    // If overtemp protection is enabled, we should check it now
+    if (temp >= OVERTEMP_THRESHOLD) {
+
+        // Value is too high, we might need to reduce it
+        // Make sure that the last time increment is far enough behind
+        if (sec() - lastOvertempTime >= OVERTEMP_INTERVAL) {
+
+            // Make sure that the process won't get interrupted
+            disableInterrupts();
+
+            // We're good to go, it hasn't been too long
+            motor.setRMSCurrent(motor.getRMSCurrent() - OVERTEMP_INCREMENT);
+
+            // Fix the last overtemp time
+            lastOvertempTime = sec();
+
+            // We're good to go, re-enable them
+            enableInterrupts();
+        }
+    }
+    
+    // Return the temperature
+    return temp;
 }
 
 

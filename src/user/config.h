@@ -5,7 +5,7 @@
 #include "Arduino.h"
 
 // Version of the firmware (displayed on OLED) (follows semantic versioning)
-#define VERSION "0.0.16"
+#define VERSION "0.0.17"
 
 
 // --------------  Settings  --------------
@@ -67,6 +67,14 @@
 #else
     // Classic, static current
     #define STATIC_RMS_CURRENT     750 // This is the rating of the motor from the manufacturer
+
+    // Overtemperature protection (lowers motor current when motor temperature rises too high)
+    #define ENABLE_OVERTEMP_PROTECTION
+    #ifdef ENABLE_OVERTEMP_PROTECTION
+        #define OVERTEMP_THRESHOLD 80 // The temp to trigger a overtemp current reduction (C)
+        #define OVERTEMP_INCREMENT 50 // The increment at which to reduce the current by (RMS mA)
+        #define OVERTEMP_INTERVAL  30 // The minimum interval between current reductions (s)
+    #endif
 #endif
 #define MIN_MICROSTEP_DIVISOR   1 // The minimum microstepping divisor
 #define MAX_MICROSTEP_DIVISOR   32 // The maximum microstepping divisor
