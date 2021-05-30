@@ -10,6 +10,7 @@
 #define FEEDBACK_NO_VALUE        F("No value specified! Make sure to specify a value with a letter before it\n")
 #define FEEDBACK_OK              F("ok\n")
 #define FEEDBACK_CAN_NOT_ENABLED F("CAN functionality not enabled\n")
+#define FEEDBACK_INVALID_STRING  F("Invalid string. Make sure that the string had double quotations on each side\n")
 
 
 // Firmware feature prints
@@ -51,9 +52,12 @@
 #define FIRMWARE_FEATURE_PRINT (FIRMWARE_FEATURE_VERSION + FIRMWARE_FEATURE_HEADER + FIRMWARE_FEATURE_OLED + FIRMWARE_FEATURE_SERIAL + FIRMWARE_FEATURE_CAN + FIRMWARE_FEATURE_STALLFAULT + FIRMWARE_FEATURE_DYNAMIC_CURRENT)
 
 // Parse a string for commands, returning the feedback on the command
-String parseString(String buffer);
+String parseCommand(String buffer);
 
 // Parse a string for a value after a letter
 String parseValue(String buffer, char letter);
+
+// Parses a string for a string after a letter
+String parseString(String buffer, char letter);
 
 #endif

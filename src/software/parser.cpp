@@ -7,7 +7,7 @@
 #include "parser.h"
 
 // Parses an entire string for any commands
-String parseString(String buffer) {
+String parseCommand(String buffer) {
 
     // GCode Table
     //   - M17 (ex M17) - Enables the motor (overrides enable pin)
@@ -65,7 +65,7 @@ String parseString(String buffer) {
             case 116:
                 // M116 (ex M116 S1) - Simple ping command that will send a message back to the sender. 
                 // S value should be the CAN ID of the sender. If S is -1, then 
-                txCANString(parseValue(buffer, 'S').toInt(), "ok");
+                txCANString(parseValue(buffer, 'S').toInt(), parseString(buffer, 'M'));
             #endif
 
             case 306:
@@ -235,25 +235,76 @@ String parseString(String buffer) {
 // Returns the substring of the value after the letter parameter
 String parseValue(String buffer, char letter) {
 
-    // Search the input string for a V (for the value measurement)
-    uint8_t charIndex = buffer.indexOf(toupper(letter));
+    // Search the input string for the specified letter
+    uint16_t charIndex = buffer.indexOf(toupper(letter));
 
-    // If the index came back with a value, we can convert the value to an integer and set it
+    // If the index came back with a value, we can begin the process of extracting the raw value
     if (charIndex != -1) {
 
-        // Check to see if there is another space in the string before the end (for a string with multiple parameters)
-        if (buffer.lastIndexOf(' ') > charIndex) {
+        // Get the next index of a space
+        uint16_t nextSpaceIndex = buffer.substring(charIndex).indexOf(' ');
 
-            // Return only the substring between the last space and the letter
-            return buffer.substring(charIndex + 1, buffer.lastIndexOf(' '));
+        // Check to see if there is a space between the letter and value
+        if (nextSpaceIndex == charIndex + 1) {
+
+            // We need to find out if there is another space after this parameter
+            uint16_t endSpaceIndex = buffer.substring(nextSpaceIndex + 1).indexOf(' ');
+
+            // Check to see if there is an ending space
+            if (endSpaceIndex != -1) {
+
+                // Return only the substring between the ending space and the space after the letter
+                return buffer.substring(nextSpaceIndex + 1, endSpaceIndex - 1);
+            }
+            else {
+                // That's the end of the string, we can start at the space and just include the rest
+                return buffer.substring(nextSpaceIndex + 1);
+            }
+        }
+        else if (nextSpaceIndex != -1) {
+            // The next space index is after the value, so just include up to it
+            return buffer.substring(charIndex + 1, nextSpaceIndex - 1);
         }
         else {
-            // Get the rest of the string after the letter (should only be a number)
+            // There is no more spaces in the string, therefore just return the rest of the string
             return buffer.substring(charIndex + 1);
         }
     }
     else {
         // Index is invalid, V doesn't exist. Print an output message, then return a null
+        Serial.println(FEEDBACK_NO_VALUE);
+        return "-1";
+    }
+}
+
+
+// Returns the substring of the string after the letter parameter
+String parseString(String buffer, char letter) {
+
+    // Search the input string for the specified letter
+    uint16_t charIndex = buffer.indexOf(toupper(letter));
+
+    // If the index came back with a value, we can begin the process of extracting the raw value
+    if (charIndex != -1) {
+
+        // Time to check to see where the double quotations are
+        uint16_t startQuotationIndex = buffer.substring(charIndex + 1).indexOf('"');
+        uint16_t endQuotationIndex = buffer.substring(startQuotationIndex + 1).indexOf('"');
+
+        // Make sure that there are quotations on each side
+        if (startQuotationIndex != -1 && endQuotationIndex != -1) {
+            
+            // Return the string between them
+            return buffer.substring(startQuotationIndex + 1, endQuotationIndex - 1);
+        }
+        else {
+            // Throw an error, we can't find both the quotation marks
+            Serial.println(FEEDBACK_INVALID_STRING);
+            return "-1";
+        }
+    }
+    else {
+        // Index is invalid, letter doesn't exist. Print an output message, then return a null
         Serial.println(FEEDBACK_NO_VALUE);
         return "-1";
     }

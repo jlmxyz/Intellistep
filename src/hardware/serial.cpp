@@ -89,7 +89,7 @@ void runSerialParser() {
     if (serialCommandBuffer != "-1") {
 
         // Send the feedback from the serial command
-        sendSerialMessage(parseString(serialCommandBuffer));
+        sendSerialMessage(parseCommand(serialCommandBuffer));
     }
 }
 

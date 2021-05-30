@@ -95,7 +95,7 @@ void checkCANCmd() {
         disableInterrupts();
 
         // Parse the command
-        parseString(CANCommandString.substring(0, CANCommandString.indexOf('>')));
+        parseCommand(CANCommandString.substring(0, CANCommandString.indexOf('>')));
 
         // Empty the buffer
         CANCommandString = "";
