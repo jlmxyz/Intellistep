@@ -28,7 +28,7 @@ StepperMotor::StepperMotor(float P, float I, float D) {
     analogWriteFrequency(MOTOR_PWM_FREQ * 1000);
 
     // Disable the motor
-    disable(DISABLED);
+    setState(DISABLED, true);
 }
 
 // Constructor without PID terms
@@ -50,7 +50,7 @@ StepperMotor::StepperMotor() {
     analogWriteFrequency(MOTOR_PWM_FREQ * 1000);
 
     // Disable the motor
-    disable(DISABLED);
+    setState(DISABLED, true);
 }
 
 
@@ -525,35 +525,32 @@ float StepperMotor::speedToHz(float angularSpeed) const {
 }
 
 
-// Enables the motor, powering the coils
-void StepperMotor::enable(MOTOR_STATE stateToClear) {
+// Sets a new motor state
+void StepperMotor::setState(MOTOR_STATE newState, bool clearErrors) {
 
-    // Clear the forced disable if needed
-    if ((this -> state) == stateToClear) {
+    // Check to make sure that the state is different from the current
+    if ((this -> state) != newState) {
 
-        // Mod the current angle by total phase angle to estimate the phase angle of the motor, then set the coils to the current position
-        this -> driveCoils(0, COUNTER_CLOCKWISE);
+        // Check if we need to clear the errors
+        if (clearErrors) {
+            switch (newState) {
 
-        // Set the motor to be enabled
-        this -> state = ENABLED;
-    }
-}
+                // Need to clear the disabled state and start the coils
+                case ENABLED:
+                    driveCoils(0, COUNTER_CLOCKWISE);
+                    this -> state = ENABLED;
 
-
-// Disables the motor, freeing the coils
-void StepperMotor::disable(MOTOR_STATE newState) {
-
-    // Check if the motor is not enabled yet. No need to disable the coils if they're already off
-    if ((this -> state) == ENABLED && newState != ENABLED) {
-
-        // Set the A driver to whatever disable mode was set
-        setCoil(A, IDLE_MODE);
-
-        // Set the B driver to whatever disable mode was set
-        setCoil(B, IDLE_MODE);
-
-        // Set the state to the specified
-        this -> state = newState;
+                // No other special processing needed, just set the state
+                default:
+                    this -> state = newState;
+            }
+        }
+        else {
+            // Only change the state if the current state is either enabled or disabled
+            if ((this -> state) == ENABLED || (this -> state) == DISABLED) {
+                this -> state = newState;
+            }
+        }
     }
 }
 
