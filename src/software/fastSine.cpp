@@ -1,7 +1,7 @@
 #include "fastSine.h"
 
 // Main sine lookup table
-static const int16_t sineTable[128] = {
+static const int16_t sineTable[SINE_VAL_COUNT] = {
      0,    490,    980,   1467,   1950,   2429,   2902,   3368,   3826,   4275,
   4713,   5141,   5555,   5956,   6343,   6715,   7071,   7409,   7730,   8032,
   8314,   8577,   8819,   9039,   9238,   9415,   9569,   9700,   9807,   9891,
@@ -49,7 +49,7 @@ int16_t sinLookup(int16_t sinValue, ARRAY_SCAN_DIR direction) {
     if (direction == FRONT) {
 
         // Loop through the values, starting at index 0 and counting to the length of the index
-        for (uint8_t counter = 0; counter < (sizeof(sineTable) / sizeof(sineTable[0])); counter++) {
+        for (uint8_t counter = 0; counter < SINE_VAL_COUNT; counter++) {
 
             // Check if the value matches, if so return
             if (sinValue == sineTable[counter]) {
@@ -59,7 +59,7 @@ int16_t sinLookup(int16_t sinValue, ARRAY_SCAN_DIR direction) {
     }
     else {
         // Loop through the values, starting at the length of the index and counting down
-        for (uint8_t counter = (sizeof(sineTable) / sizeof(sineTable[0])); counter >= 0; counter--) {
+        for (uint8_t counter = SINE_VAL_COUNT - 1; counter >= 0; counter--) {
 
             // Check if the value matches, if so return
             if (sinValue == sineTable[counter]) {
