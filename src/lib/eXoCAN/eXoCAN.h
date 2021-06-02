@@ -67,11 +67,11 @@ constexpr static uint32_t afioBase = 0x40010000UL;
 constexpr static uint32_t mapr = afioBase + 0x004; // alternate pin function mapping
 
 constexpr static uint32_t gpioABase = 0x40010800UL; // port A
-constexpr static uint32_t crhA = gpioABase + 0x004; // cntrl reg for port b
+constexpr static uint32_t crhA = gpioABase + 0x004; // cntrl reg for port A
 constexpr static uint32_t odrA = gpioABase + 0x00c; // output data reg
 
 constexpr static uint32_t gpioBBase = gpioABase + 0x400; // port B
-constexpr static uint32_t crhB = gpioBBase + 0x004;      // cntrl reg for port b
+constexpr static uint32_t crhB = gpioBBase + 0x004;      // cntrl reg for port B
 constexpr static uint32_t odrB = gpioBBase + 0x00c;      // output data reg
 
 // Clock
