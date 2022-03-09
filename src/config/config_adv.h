@@ -110,8 +110,8 @@ typedef float real_t;
 
 // Dynamic current (adjusts motor current based on acceleration (and therefore torque)
 // required from the motor)
-//#define ENABLE_DYNAMIC_CURRENT
-#ifdef ENABLE_DYNAMIC_CURRENT
+#define ENABLE_DYNAMIC_CURRENT  0
+#if (ENABLE_DYNAMIC_CURRENT != 0 )
     // A dynamically controller current loop. Uses the equation: accel * accelCurrent + idleCurrent
     // Limited by the max dynamic current, which will limit the maximum that the dynamic loop can output
     // All current values are in RMS

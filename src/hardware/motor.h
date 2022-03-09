@@ -28,6 +28,7 @@ typedef enum {
     COAST
 } COIL_STATE;
 
+
 #if 1
     // 89.9kHz
     // 92.12kHz
@@ -57,6 +58,16 @@ typedef enum {
     #endif
 } MOTOR_STATE;
 
+//fwd declaration to save build time
+class FlashParameters;
+
+struct UnitToStepsScale
+{
+    float xFactor;
+    float yFactor;
+    float zFactor;
+};
+
 // Stepper motor class (defined to make life a bit easier when dealing with the motor)
 class StepperMotor {
 
@@ -64,7 +75,7 @@ class StepperMotor {
     public:
 
         // Initialize the motor
-        StepperMotor();
+        StepperMotor(FlashParameters& aParameters);
 
         #ifndef DISABLE_ENCODER
         // Returns the current RPM of the encoder
@@ -124,7 +135,7 @@ class StepperMotor {
         int32_t getUnhandledStepCNT();
 
         // Dynamic current
-        #ifdef ENABLE_DYNAMIC_CURRENT
+        #if (ENABLE_DYNAMIC_CURRENT != 0 )
 
         // Gets the acceleration factor for dynamic current
         uint16_t getDynamicAccelCurrent() const;
@@ -242,6 +253,9 @@ class StepperMotor {
     // Things that shouldn't be accessed by the outside
     private:
 
+        // Initialize the motor private constructor to prevent using it
+        StepperMotor();
+
         // Function for getting the sign of the number (returns -1 if number is less than 0, 1 if 0 or above)
         int32_t getSign(float num);
 
@@ -263,28 +277,10 @@ class StepperMotor {
             bool isStepping = false;
         #endif
 
-        // Motor characteristics
-        #ifdef ENABLE_DYNAMIC_CURRENT
-            // Dynamic current settings
-            uint16_t dynamicAccelCurrent = DYNAMIC_ACCEL_CURRENT;
-            uint16_t dynamicIdleCurrent = DYNAMIC_IDLE_CURRENT;
-            uint16_t dynamicMaxCurrent = DYNAMIC_MAX_CURRENT;
-        #else
-            // RMS Current (in mA)
-            uint16_t rmsCurrent = (uint16_t)STATIC_RMS_CURRENT;
-            // Peak Current (in mA)
-            uint16_t peakCurrent = (rmsCurrent * 1.414);
-        #endif
-
-        // Microstepping divisor
-        uint8_t microstepDivisor = 1;
 
         // Microstep lock (makes sure that dips can't set a value
         // once the divisor is set by another source)
         bool microstepLocked = false;
-
-        // Angle of a full step
-        float fullStepAngle = 1.8;
 
         // Microstep angle (full step / microstepping divisor)
         float microstepAngle = getFullStepAngle() / getMicrostepping();
@@ -320,6 +316,9 @@ class StepperMotor {
 
         // HardwareTimer (required to assign interrupt)
         HardwareTimer *tim2HWTim = new HardwareTimer(TIM2);
+
+        //object to store non volatile parameters 
+        FlashParameters& mParameters;
 };
 
 // ISR functions

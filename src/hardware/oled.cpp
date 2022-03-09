@@ -6,6 +6,7 @@
 
 // Import libraries
 #include "oled.h"
+#include "flash.h"
 #include "cstring"
 
 // Screen data is stored in an array. Each set of 8 pixels is written one by one
@@ -304,7 +305,7 @@ void selectMenuItem() {
 
             case CURRENT:
                 // Motor mAs. Need to get the current motor mAs, then convert that to a cursor value
-                #ifndef ENABLE_DYNAMIC_CURRENT
+                #if (ENABLE_DYNAMIC_CURRENT == 0 )
                     currentCursorIndex = constrain(round(motor.getRMSCurrent() / 100), 0, (uint16_t)MAX_RMS_BOARD_CURRENT);
                 #endif
                 break;
@@ -373,7 +374,7 @@ void selectMenuItem() {
                 }
                 else {
                     // Set the value
-                    #ifndef ENABLE_DYNAMIC_CURRENT
+                    #if (ENABLE_DYNAMIC_CURRENT == 0 )
                         motor.setRMSCurrent(rmsCurrentSetting % (uint16_t)MAX_RMS_BOARD_CURRENT);
                     #endif
 
@@ -448,17 +449,17 @@ void selectMenuItem() {
                 uint8_t cursorMod = currentCursorIndex % 3;
                 if (cursorMod == 0) {
                     // First index, the save parameters, then return
-                    saveParameters();
+                    FlashParameters::getInstance().saveParameters();
                     menuDepth = MENU_RETURN_LEVEL;
                 }
                 else if (cursorMod == 1) {
                     // Second index, load the parameters
-                    loadParameters();
+                    FlashParameters::getInstance().loadParameters();
                     menuDepth = MENU_RETURN_LEVEL;
                 }
                 else {
                     // We must be on the third index, wipe the parameters
-                    wipeParameters();
+                    FlashParameters::getInstance().wipeParameters();
                     // No need to return here, the processor reboots
                 }
         }
@@ -477,7 +478,7 @@ void selectMenuItem() {
             case CURRENT:
 
                 // Calculate the setting from the cursor index
-                #ifndef ENABLE_DYNAMIC_CURRENT
+                #if (ENABLE_DYNAMIC_CURRENT == 0 )
                     motor.setRMSCurrent((100 * currentCursorIndex) % (uint16_t)MAX_RMS_BOARD_CURRENT);
                 #endif
 

@@ -10,7 +10,7 @@
 #include "cube.h"
 
 // Create a new motor instance
-StepperMotor motor = StepperMotor();
+StepperMotor motor = StepperMotor(FlashParameters::getInstance());
 
 // Create a variable for storing the starting time
 // Used for timing display updates to be smooth regardless of processsing time
@@ -140,7 +140,7 @@ void setup() {
     //writeOLEDString(0, 0, "Close Loop Mode");
 
     // Check if the board is calibrated. Need to force calibration if the board isn't calibrated
-    if (!isCalibrated()) {
+    if (!FlashParameters::getInstance().isCalibrated()) {
 
         // Only needed for OLED changes
         #ifdef ENABLE_OLED
@@ -225,7 +225,7 @@ void setup() {
             writeOLEDString(0, LINE_HEIGHT * 2, F("Flash load"), false);
 
             // Attempt to load the parameters from flash
-            if (loadParameters() == FLASH_LOAD_SUCCESSFUL) {
+            if (FlashParameters::getInstance().loadParameters() == FLASH_LOAD_SUCCESSFUL) {
                 writeOLEDString(0, LINE_HEIGHT * 3, F("successful"), true);
             }
             else {

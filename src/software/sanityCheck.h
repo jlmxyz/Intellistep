@@ -40,13 +40,13 @@
 #endif
 
 // Check to make sure that at least a peak or RMS default current is defined
-#if !(defined(STATIC_PEAK_CURRENT) || defined(STATIC_RMS_CURRENT)) && !defined(ENABLE_DYNAMIC_CURRENT)
+#if !(defined(STATIC_PEAK_CURRENT) || defined(STATIC_RMS_CURRENT)) && (ENABLE_DYNAMIC_CURRENT == 0)
     #error "A static peak or static RMS current must be defined!"
 
 // Check to make sure both aren't defined already
-#elif (defined(STATIC_PEAK_CURRENT) && defined(STATIC_RMS_CURRENT)) && !defined(ENABLE_DYNAMIC_CURRENT)
+#elif (defined(STATIC_PEAK_CURRENT) && defined(STATIC_RMS_CURRENT)) && (ENABLE_DYNAMIC_CURRENT == 0)
     #error "Only max peak or max RMS current can be defined, not both!"
-#elif !defined(ENABLE_DYNAMIC_CURRENT)
+#elif (ENABLE_DYNAMIC_CURRENT == 0)
     // Calculate the other current maximum
     #ifdef STATIC_PEAK_CURRENT
         #define STATIC_RMS_CURRENT (uint16_t)(STATIC_PEAK_CURRENT * 0.707)
@@ -125,7 +125,7 @@
     #define FIRMWARE_FEATURE_STALLFAULT    ""
 #endif
 
-#ifdef ENABLE_DYNAMIC_CURRENT
+#if (ENABLE_DYNAMIC_CURRENT != 0)
     #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    "\nDynamic Current"
 #else
     #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    ""
