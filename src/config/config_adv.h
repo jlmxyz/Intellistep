@@ -251,7 +251,7 @@ typedef float real_t;
 #ifndef STEP_CORRECTION
     //#define DISABLE_CORRECTION_TIMER
 #endif
-//#define DISABLE_ENCODER
+#define ENABLE_ENCODER true
 
 // LED related debugging
 #ifdef ENABLE_LED

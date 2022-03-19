@@ -213,7 +213,7 @@ void dirChangeISR() {
 }
 #endif
 
-#ifndef DISABLE_ENCODER
+#if (ENABLE_ENCODER == true)
 // Returns the current RPM of the encoder
 float StepperMotor::getEncoderRPM() {
 
@@ -280,7 +280,7 @@ int32_t StepperMotor::getStepError() {
 int32_t StepperMotor::getStepError(double currentAbsAngle) {
     return (getDesiredStep() - round(currentAbsAngle / (this -> microstepAngle)));
 }
-#endif
+#endif // ENABLE_ENCODER
 
 // Returns the current step of the motor phases (only 1 rotation worth)
 int32_t StepperMotor::getStepPhase() {
@@ -966,7 +966,7 @@ void StepperMotor::calibrate() {
     // Delay three seconds, giving the motor time to settle
     delay(3000);
 
-    #ifndef DISABLE_ENCODER
+    #if (ENABLE_ENCODER == true)
     // Force the encoder to be read a couple of times, wiping the previous position out of the average
     // (this reading needs to be as precise as possible)
     for (uint8_t readings = 0; readings < ANGLE_AVG_READINGS; readings++) {
@@ -986,7 +986,7 @@ void StepperMotor::calibrate() {
     while (stepOffset > getMicrostepAngle()) {
         stepOffset -= getMicrostepAngle();
     }
-    #endif
+    #endif  // ENABLE_ENCODER
 
     // Calibrate PID loop
 
@@ -995,11 +995,11 @@ void StepperMotor::calibrate() {
     mParameters.eraseParameters();
 
     // Write the step offset into the flash
-    mParameters.setCalibration( stepOffset);
-    #ifndef DISABLE_ENCODER
-    #else
-    writeFlash(STEP_OFFSET_INDEX, (float)0);
-    #endif
+    #if (ENABLE_ENCODER == true)
+        mParameters.setCalibration( stepOffset);
+    #else // ENABLE_ENCODER == false
+        mParameters.setCalibration( 0, false);
+    #endif // ENABLE_ENCODER
 
     //save to flash
     mParameters.saveParameters();

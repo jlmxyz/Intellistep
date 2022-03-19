@@ -105,7 +105,7 @@ public:
     void setMicrostepping(uint8_t setMicrostepping);
 
     float getCalibration() const;   
-    void setCalibration(float aStepOffset);
+    void setCalibration(float aStepOffset, bool aIsCalibrated=true);
 
     void setDipswitchUse (bool enable);
     bool getDipswitchUse();

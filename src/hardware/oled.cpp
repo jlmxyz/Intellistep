@@ -212,11 +212,11 @@ void displayMotorData() {
     }
 
     // Get the current absolute angle
-    #ifndef DISABLE_ENCODER
+    #if (ENABLE_ENCODER == true)
     double currentAbsAngle = motor.encoder.getAbsoluteAngle();
-    #else
+    #else //ENABLE_ENCODER == false
     double currentAbsAngle = 0;
-    #endif
+    #endif //ENABLE_ENCODER
 
     // Check if we should be displaying step count instead of RPM
     #ifdef SHOW_STEP_CNT_INSTEAD_OF_RPM
@@ -258,9 +258,9 @@ void displayMotorData() {
     writeOLEDString(0, LINE_HEIGHT * 2, outBuffer, false);
 
     // Temp of the encoder (close to the motor temp)
-    #ifndef DISABLE_ENCODER
+    #if (ENABLE_ENCODER == true)
     snprintf(outBuffer, OB_SIZE, "TEMP:%8.1f C", motor.encoder.getTemp());
-    #endif
+    #endif //ENABLE_ENCODER
     writeOLEDString(0, LINE_HEIGHT * 3, outBuffer, true);
 }
 

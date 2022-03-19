@@ -331,9 +331,9 @@ uint8_t FlashParameters::getMicrostepping() const {
 }
 
 
-void FlashParameters::setCalibration(float aStepOffset){
+void FlashParameters::setCalibration(float aStepOffset, bool aIsCalibrated){
     mParameters.calibration.stepOffset = aStepOffset;
-    mParameters.calibration.calibrated = true;
+    mParameters.calibration.calibrated = aIsCalibrated;
     mParameters.crc = computeCRC(mParameters);
 }
 

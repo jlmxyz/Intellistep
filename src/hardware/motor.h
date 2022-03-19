@@ -77,7 +77,7 @@ class StepperMotor {
         // Initialize the motor
         StepperMotor(FlashParameters& aParameters);
 
-        #ifndef DISABLE_ENCODER
+        #if (ENABLE_ENCODER == true)
         // Returns the current RPM of the encoder
         float getEncoderRPM();
 
@@ -91,7 +91,7 @@ class StepperMotor {
 
             // Compute the stepping interface RPM
             float getSteppingRPM();
-        #endif
+        #endif //ENABLE_STEPPING_VELOCITY
 
         // Returns the angular deviation of the motor from the set position
         float getAngleError();
@@ -100,7 +100,7 @@ class StepperMotor {
         // Returns the step deviation of the motor from the set position
         int32_t getStepError();
         int32_t getStepError(double currentAbsAngle);
-        #endif
+        #endif // ENABLE_ENCODER
 
         // Returns the current phase setting of the motor
         int32_t getStepPhase();
@@ -239,9 +239,9 @@ class StepperMotor {
         void calibrate();
 
         // Encoder object
-        #ifndef DISABLE_ENCODER
+        #if (ENABLE_ENCODER == true)
         Encoder encoder;
-        #endif
+        #endif //ENABLE_ENCODER
 
         // Counter for number of overflows of TIM2 -> CNT (needs to be public for the interrupt)
         // TIM2 -> CNT is unsigned, stepOverflowOffset is unsigned, but ((TIM2 -> CNT) + stepOverflowOffset) is treated as signed value
