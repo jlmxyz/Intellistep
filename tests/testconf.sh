@@ -1,23 +1,40 @@
 export MotorSerial=/dev/ttyUSB0
+export BaudRate=115200
 
 
 openSerial() 
 {
-    exec 3<>${MotorSerial}
+    stty -F ${MotorSerial} ${BaudRate}
+    export LOGFILE=$(date +%y-%m-%d.%T).$(basename "$0").log
+    echo '##### start of test' | tee ${LOGFILE}
+    exec 4<${MotorSerial}
+    exec 5>${MotorSerial}
 }
 
 closeSerial()
 {
-    exec 3<>&- 
+    echo "##### end of test" | tee -a ${LOGFILE}
+    exec 4<&-
+    exec 5<&-
 }
 
 sendSerial()
-{
-    echo $@ >&3
+{    
+    echo "##### $@" | tee -a ${LOGFILE}
+    echo $@ >&5
 }
 
 readSerial()
 {
-    buff=$(read <&3)
-    return ${buff}
+    res=""
+    _res="XXXX"
+    while  [ "${_res}" != "${IFS}" ]; do
+        read -r _res <&4
+        _res="${_res}${IFS}"
+        if  [ "${_res}" != "${IFS}" ]; then
+            res="${res}${_res}"
+        fi
+    done
+    sleep 0.5
+    echo "${res}" | tee -a ${LOGFILE}
 }

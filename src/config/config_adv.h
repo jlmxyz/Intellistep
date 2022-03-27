@@ -167,8 +167,8 @@ typedef float real_t;
 // ! WARNING: For the time being, CAN must be enabled
 // ! Disabling it will result in the encoder not working
 // ! YOU HAVE BEEN WARNED!
-#define ENABLE_CAN
-#ifdef ENABLE_CAN
+#define ENABLE_CAN 0
+#if (ENABLE_CAN != 0)
     // The CAN ID of this board
     // X:2, X2:3...
     // Y:7, Y2:8...

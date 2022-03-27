@@ -944,7 +944,7 @@ MOTOR_STATE StepperMotor::getState() const {
 void StepperMotor::calibrate() {
 
     // Only include if specified
-    #ifdef ENABLE_OLED
+    #if (ENABLE_OLED != 0)
 
         // Display that calibration is coming soon
         clearOLED();

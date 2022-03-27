@@ -16,7 +16,7 @@ uint32_t lastButtonClickTime = 0;
 void initButtons() {
 
   // Only build if specified
-  #ifdef ENABLE_OLED
+  #if (ENABLE_OLED != 0)
 
     // Down pin (moves the menu down)
     pinMode(DOWN_BUTTON_PIN, INPUT_PULLUP);
@@ -39,7 +39,7 @@ void initButtons() {
 }
 
 // Only include button code if using the OLED panel
-#ifdef ENABLE_OLED
+#if (ENABLE_OLED != 0)
 
 // Scan each of the buttons
 void checkButtons() {

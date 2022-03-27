@@ -2,7 +2,7 @@
 #include "config.h"
 
 // Only build if needed
-#ifdef ENABLE_OLED
+#if (ENABLE_OLED != 0)
 
 // Import libraries
 #include "oled.h"

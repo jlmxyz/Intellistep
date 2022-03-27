@@ -21,7 +21,7 @@
 #endif
 
 // Warning settings only need checked when the OLED is enabled
-#ifdef ENABLE_OLED
+#if (ENABLE_OLED != 0)
     // Check to make sure that at least a peak or RMS wanring current is defined
     #if !(defined(WARNING_PEAK_CURRENT) || defined(WARNING_RMS_CURRENT))
         #error "A warning peak or warning RMS current must be defined!"
@@ -101,19 +101,19 @@
 #define FIRMWARE_FEATURE_HEADER   String("Enabled features:")
 
 // Firmware feature print definition
-#ifdef ENABLE_OLED
+#if (ENABLE_OLED != 0)
     #define FIRMWARE_FEATURE_OLED     "\nOLED"
 #else
     #define FIRMWARE_FEATURE_OLED     ""
 #endif
 
-#ifdef ENABLE_SERIAL
+#if (ENABLE_SERIAL != 0)
     #define FIRMWARE_FEATURE_SERIAL    "\nSerial"
 #else
     #define FIRMWARE_FEATURE_SERIAL    ""
 #endif
 
-#ifdef ENABLE_CAN
+#if (ENABLE_CAN != 0)
     #define FIRMWARE_FEATURE_CAN    "\nCAN"
 #else
     #define FIRMWARE_FEATURE_CAN    ""

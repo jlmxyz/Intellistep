@@ -2,7 +2,7 @@
 #include "config.h"
 
 // Only include if the serial or CAN bus is enabled
-#if defined(ENABLE_SERIAL) || defined(ENABLE_CAN)
+#if ((ENABLE_SERIAL !=0) || (ENABLE_CAN != 0))
 
 #include "parser.h"
 
@@ -54,21 +54,22 @@ String parseCommand(String buffer) {
         // Switch statement the command number
         switch (parseValue(buffer, 'M').toInt()) {
 
-            case 17:
+            case 17: {
                 // M17 (ex M17) - Enables the motor (overrides enable pin)
                 motor.setState(FORCED_ENABLED, true);
                 return FEEDBACK_OK;
+            }
 
-            case 18:
+            case 18: {
                 // M18 / M84 (ex M18 or M84) - Disables the motor (overrides enable pin)
                 motor.setState(FORCED_DISABLED, true);
                 return FEEDBACK_OK;
-
-            case 84:
+            }
+            case 84:{
                 // M18 / M84 (ex M18 or M84) - Disables the motor (overrides enable pin)
                 motor.setState(FORCED_DISABLED, true);
                 return FEEDBACK_OK;
-
+            }
             case 93: {
                 // M93 (ex M93 V1.8 or M93) - Sets the angle of a full step. This value should be 1.8° or 0.9°. This value should be 1.8° or 0.9°. If no value is provided, then the current value will be returned.
                 float setValue = parseValue(buffer, 'V').toFloat();
@@ -84,15 +85,16 @@ String parseCommand(String buffer) {
                 }
             }
 
-            case 115:
+            case 115: {
                 // M115 (ex M115) - Prints out firmware information.
                 return FIRMWARE_FEATURE_PRINT;
-
-            #ifdef ENABLE_CAN
-            case 116:
+            }
+            #if (ENABLE_CAN != 0)
+            case 116: {
                 // M116 (ex M116 S1) - Simple forward command that will forward a message across the CAN bus. Can be used for pinging or allowing a Serial to connect to the CAN network
                 // The buffer.substring prevents the first M from being read
                 txCANString(parseValue(buffer, 'S').toInt(), parseString(buffer.substring(1), 'M'));
+            }
             #endif
 
             #ifdef ENABLE_PID
@@ -244,7 +246,7 @@ String parseCommand(String buffer) {
             case 356: {
 
                 // Only build in functionality if specified
-                #ifdef ENABLE_CAN
+                #if (ENABLE_CAN != 0)
                     // M356 (ex M356 V1 or M356 VX2 or M356) - Sets or gets the CAN ID of the board. Can be set using the axis character or actual ID. If no value is provided, then the current value will be returned.
 
                     // Check the value of the axis
@@ -343,20 +345,22 @@ String parseCommand(String buffer) {
                 #endif
             }
 
-            case 500:
+            case 500: {
                 // M500 (ex M500) - Saves the currently loaded parameters into flash
                 FlashParameters::getInstance().saveParameters();
                 return FEEDBACK_OK;
+            }
 
             case 501: {
                 // M501 (ex M501) - Loads all saved parameters from flash
                 return FlashParameters::getInstance().loadParameters();
             }
 
-            case 502:
+            case 502: {
                 // M502 (ex M502) - Wipes all parameters from flash, then reboots the system
                 FlashParameters::getInstance().wipeParameters();
                 // No return here because wipeParameters reboots processor
+            }
 
             case 907: {
                 // Sets or gets the RMS(R) or Peak(P) current in mA. If dynamic current is enabled, then the accel(A), idle(I), and/or max(M) can be set or retrieved. If no value is set, then the current RMS current (no dynamic current) or the accel, idle, and max terms (dynamic current) will be returned.

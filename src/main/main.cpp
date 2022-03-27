@@ -102,7 +102,7 @@ void setup() {
     #endif
 
     // Only run if the OLED is enabled
-    #ifdef ENABLE_OLED
+    #if (ENABLE_OLED != 0)
 
         // Initialize the OLED
         initOLED();
@@ -125,12 +125,12 @@ void setup() {
     #endif
 
     // Initialize the serial bus
-    #ifdef ENABLE_SERIAL
+    #if (ENABLE_SERIAL != 0)
         initSerial();
     #endif
 
     // Initialize the CAN bus
-    #ifdef ENABLE_CAN
+    #if (ENABLE_CAN != 0)
         // Initialize the CAN bus
         initCAN();
     #endif
@@ -143,7 +143,7 @@ void setup() {
     if (!FlashParameters::getInstance().isCalibrated()) {
 
         // Only needed for OLED changes
-        #ifdef ENABLE_OLED
+        #if (ENABLE_OLED != 0)
         // Note the start time
         uint32_t startTime = getCurrentMillis();
 
@@ -157,7 +157,7 @@ void setup() {
         while(true) {
 
             // Only display to screen if the screen is enabled
-            #ifdef ENABLE_OLED
+            #if (ENABLE_OLED != 0)
 
             // Calculate the elapsed time (should make the if comparisions faster and more consistent)
             uint32_t elapsedTime = (getCurrentMillis() - startTime);
@@ -199,12 +199,19 @@ void setup() {
                 motor.calibrate();
             }
 
-            #else // ! ENABLE_OLED
+            #endif // ! ENABLE_OLED
+                // Check to see if serial data is available to read
+            #if (ENABLE_SERIAL != 0)
+                runSerialParser();
+            #endif
 
+            #if ((ENABLE_SERIAL == 0) && (ENABLE_OLED == 0)) 
             // Just jump to calibrating the motor (board reboots afterward)
             // Reboot the chip
             motor.calibrate();
             #endif // ! ENABLE_OLED
+
+
 
             // ! Only for testing
             //blink();
@@ -214,7 +221,7 @@ void setup() {
         // There is a calibration, load it and move on to the loop
 
         // Only include the extensive flash printout if the OLED is enabled
-        #ifdef ENABLE_OLED
+        #if (ENABLE_OLED != 0)
 
             // Let the user know that the calibration was successfully loaded
             clearOLED();
@@ -270,7 +277,7 @@ void setup() {
     #endif //ENABLE_ENCODER
 
     // Only need to display info if OLED is enabled
-    #ifdef ENABLE_OLED
+    #if (ENABLE_OLED != 0)
     // Let the user read the message
     delay(POWERUP_DISPLAY_TIME - (startTime - getCurrentMillis()));
 
@@ -293,11 +300,11 @@ void loop() {
     checkDips();
 
     // Check to see if serial data is available to read
-    #ifdef ENABLE_SERIAL
+    #if (ENABLE_SERIAL != 0)
         runSerialParser();
     #endif
 
-    #ifdef ENABLE_OLED
+    #if (ENABLE_OLED != 0)
         // Check the buttons
         checkButtons();
 
