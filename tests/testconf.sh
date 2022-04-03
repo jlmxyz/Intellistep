@@ -21,7 +21,7 @@ closeSerial()
 sendSerial()
 {    
     echo "##### $@" | tee -a ${LOGFILE}
-    echo $@ >&5
+    echo "$@" >&5
 }
 
 readSerial()
@@ -30,10 +30,13 @@ readSerial()
     _res="XXXX"
     while  [ "${_res}" != "${IFS}" ]; do
         read -r _res <&4
-        _res="${_res}${IFS}"
-        if  [ "${_res}" != "${IFS}" ]; then
-            res="${res}${_res}"
-        fi
+        if [ -n "${res}" ] && [ -n "${_res}" ]; then
+            res="${res}${IFS}${_res}"
+        elif [ -z "${_res}" ]; then
+            _res="${_res}${IFS}"
+        else
+            res=${_res}
+        fi 
     done
     sleep 0.5
     echo "${res}" | tee -a ${LOGFILE}

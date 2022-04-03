@@ -84,6 +84,7 @@ public:
     bool checkVersionMatch();
     String loadParameters();
     void wipeParameters();
+    String dumpParameters();
 
     //accessors to flashed values
     float getFullStepAngle() const;

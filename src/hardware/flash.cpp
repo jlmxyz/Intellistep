@@ -257,6 +257,42 @@ String FlashParameters::loadParameters() {
     return FLASH_LOAD_UNSUCCESSFUL;
 }
 
+
+String FlashParameters::dumpParameters() {
+    String res = "{ \"FlashVersion\" : \"" +  String(mParameters.FlashVersion) + "\"," +
+                   "\"calibration\" : { " +
+                      "\"calibrated\" : \"" + String(mParameters.calibration.calibrated) + "\"," +
+                      "\"stepOffset\" : \"" + String(mParameters.calibration.stepOffset) + "\"" +
+                    "}," +
+                   "\"current\" : { " +
+                      "\"accelCurrent\" : \"" + String(mParameters.current.accelCurrent) + "\"," +
+                      "\"idleCurrent\" : \"" + String(mParameters.current.idleCurrent) + "\"," +
+                      "\"maxCurrent\" : \"" + String(mParameters.current.maxCurrent) + "\"" +
+                    "}," +
+                   "\"resolution\" : { " +
+                      "\"fullStepAngle\" : \"" + String(mParameters.resolution.fullStepAngle) + "\"," +
+                      "\"Microstepping\" : \"" + String(mParameters.resolution.Microstepping) + "\"," +
+                      "\"microstepsMultipier\" : \"" + String(mParameters.resolution.microstepsMultipier) + "\"" +
+                    "}," +
+                   "\"direction\" : { " +
+                      "\"reversed\" : \"" + String(mParameters.direction.reversed) + "\"," +
+                      "\"enableInversion\" : \"" + String(mParameters.direction.enableInversion) + "\"" +
+                    "}," +
+                   "\"pid\" : { " +
+                      "\"P\" : \"" + String(mParameters.pid.P) + "\"," +
+                      "\"I\" : \"" + String(mParameters.pid.I) + "\"," +
+                      "\"D\" : \"" + String(mParameters.pid.D) + "\"" +
+                    "}," +
+                    "\"canIndex\" : \"" +  String(mParameters.canIndex) + "\"," +
+                   "\"DipSwitches\" : { " +
+                      "\"active\" : \"" + String(mParameters.DipSwitches.active) + "\"," +
+                      "\"isDipInverted\" : \"" + String(mParameters.DipSwitches.isDipInverted) + "\"" +
+                    "}," +
+                    "\"crc\" : \"" +  String(mParameters.crc) + "\",";
+    return res;
+}
+
+
 // Wipes all parameters stored, returning to programming defaults
 // !!! WARNING !!! Reboots processor!
 void FlashParameters::wipeParameters() {

@@ -23,7 +23,7 @@ String parseCommand(String buffer) {
     //  - M154 (ex M154 S4) - Runs the manual PID tuning interface. Serial is filled with encoder angles. S term specifies the wait time.
     //  - M301 (ex M301 P1 I1 D1 W10 or M301) - Sets or gets the PID values for the motor. W term is the maximum value of the I windup. If no values are provided, then the current values will be returned.
     //  - M303 (ex M303) - Runs an autotune sequence for the PID loop
-    //  => - M350 (ex M350 V16 or M350) - Sets or gets the microstepping divisor for the motor. This value can be 1, 2, 4, 8, 16, or 32. If no value is provided, then the current microstepping divisor will be returned.
+    //  => - M350 (ex M350 S16 or M350) - Sets or gets the microstepping divisor for the motor. This value can be 1, 2, 4, 8, 16, or 32. If no value is provided, then the current microstepping divisor will be returned.
     //  - M352 (ex M352 S1 or M352) - Sets or gets the direction pin inversion for the motor (0 is standard, 1 is inverted). If no value is provided, then the current value will be returned.
     //  - M353 (ex M353 S1 or M353) - Sets or gets the enable pin inversion for the motor (0 is standard, 1 is inverted). If no value is provided, then the current value will be returned.
     //  - M354 (ex M354 S1 or M354) - Sets or gets if the motor dip switches were installed incorrectly (reversed) (0 is standard, 1 is inverted, 2 is disabled). If no value is provided, then the current value will be returned.
@@ -35,6 +35,7 @@ String parseCommand(String buffer) {
     //  - M500 (ex M500) - Saves the currently loaded parameters into flash
     //  - M501 (ex M501) - Loads all saved parameters from flash
     //  - M502 (ex M502) - Wipes all parameters from flash, then reboots the system
+    //  - M503 (ex M503) - report all settings
     //  - M575 (ex M575 P1 B57600 S1) Set serial comms parameters
     //  - M579 (ex M579 X1.0127 Y0.998) Scale Cartesian axes (to have motor handle only X commands M579 X1 Y0 Z0)
     //  - M906 (ex M906 X300 Y500 Z200 E350:350) Set motor currents mA
@@ -169,13 +170,15 @@ String parseCommand(String buffer) {
 
             case 350: {
                 // M350 (ex M350 V16 or M350) - Sets the microstepping divisor for the motor. This value can be 1, 2, 4, 8, 16, or 32. Sets or gets the microstepping divisor for the motor. This value can be 1, 2, 4, 8, 16, or 32. If no value is provided, then the current microstepping divisor will be returned.
-                int16_t setValue = parseValue(buffer, 'V').toInt();
+                int16_t setValue = parseValue(buffer, 'S').toInt();
                 if (setValue != -1) {
 
                     // Value is valid, set and return ok
-                    motor.setMicrostepping(setValue);
-                    updateCorrectionTimer();
+                    if (-1 != motor.setMicrostepping(setValue)) {
                     return FEEDBACK_OK;
+                    } else {
+                        return FEEDBACK_WRONG_VALUE;
+                    }
                 }
                 else {
                     // No value exists, get and return the current value
@@ -359,6 +362,12 @@ String parseCommand(String buffer) {
             case 502: {
                 // M502 (ex M502) - Wipes all parameters from flash, then reboots the system
                 FlashParameters::getInstance().wipeParameters();
+                // No return here because wipeParameters reboots processor
+            }
+
+            case 503: {
+                // M503 (ex M503) - Wipes all parameters from flash, then reboots the system
+                return FlashParameters::getInstance().dumpParameters();
                 // No return here because wipeParameters reboots processor
             }
 
