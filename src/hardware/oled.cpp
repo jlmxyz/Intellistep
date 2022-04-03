@@ -173,6 +173,25 @@ void updateDisplay() {
                     }
                     break;
 
+                case DIP_SWITCHES:
+                    // Another easy menu, just the use of dip switches or ignore them
+                    clearOLED();
+
+                    // Title
+                    writeOLEDString(0, 0, F("Dip switches:"), false);
+
+                    // Write the string to the screen
+                    if (currentCursorIndex % 2 == 0) {
+
+                        // The index is even, the logic is inverted
+                        writeOLEDString(0, (3 * LINE_HEIGHT / 2), F("Used"), true);
+                    }
+                    else {
+                        // Index is odd, the logic is normal
+                        writeOLEDString(0, (3 * LINE_HEIGHT / 2), F("Not Used"), true);
+                    }
+                    break;
+
                 case SAVED_DATA:
                     // Clear the screen of old content
                     clearOLED();
@@ -336,6 +355,17 @@ void selectMenuItem() {
                     currentCursorIndex = 1;
                 }
                 break;
+            case DIP_SWITCHES:
+                // Get if the enable pin is inverted
+                if (FlashParameters::getInstance().getDipswitchUse()) {
+                    // Value is true already, therefore start at "true"
+                    currentCursorIndex = 0;
+                }
+                else {
+                    // Otherwise set the value to false to start
+                    currentCursorIndex = 1;
+                }
+                break;
 
             case SAVED_DATA:
                 // Just set the cursor to zero, no saving of last position
@@ -438,6 +468,21 @@ void selectMenuItem() {
                 else {
                     // Index is odd, the direction is normal
                     motor.setReversed(false);
+                }
+
+                // Exit the menu
+                menuDepth = MENU_RETURN_LEVEL;
+                break;
+            case DIP_SWITCHES:
+                // Get if the dip switches are enabled
+                if (currentCursorIndex % 2 == 0) {
+
+                    // The index is even, the direction is inverted
+                    FlashParameters::getInstance().setDipswitchUse(true);
+                }
+                else {
+                    // Index is odd, the direction is normal
+                    FlashParameters::getInstance().setDipswitchUse(false);
                 }
 
                 // Exit the menu
@@ -556,6 +601,7 @@ const char* submenuItems[] = {
     "Microstep",
     "En Logic",
     "Dir. Logic",
+    "Dip switches",
     "Saved config",
     ""
 };
