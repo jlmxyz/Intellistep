@@ -367,7 +367,7 @@ int32_t StepperMotor::getUnhandledStepCNT() {
 }
 
 
-#if (ENABLE_DYNAMIC_CURRENT != 0 )
+#if (ENABLE_DYNAMIC_CURRENT != false )
 // Gets the acceleration factor for dynamic current
 uint16_t StepperMotor::getDynamicAccelCurrent() const {
     return mParameters.getAccelCurrent();
@@ -683,7 +683,7 @@ void StepperMotor::driveCoils(int32_t steps) {
     int16_t coilBPercent = fastCos(arrayIndex);
 
     // Equation comes out to be (effort * -1 to 1) depending on the sine/cosine of the phase angle
-    #if (ENABLE_DYNAMIC_CURRENT != 0 )
+    #if (ENABLE_DYNAMIC_CURRENT != false )
 
         // Get the current acceleration
         double angAccel = abs(motor.encoder.getAccel());

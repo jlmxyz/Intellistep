@@ -90,7 +90,7 @@ public:
     void setFullStepAngle(float newAngle);
 
     
-#if (ENABLE_DYNAMIC_CURRENT != 0)
+#if (ENABLE_DYNAMIC_CURRENT != false)
     uint16_t getAccelCurrent() const;
     void setAccelCurrent(uint16_t rmsCurrent);
 #endif

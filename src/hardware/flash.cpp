@@ -12,7 +12,7 @@ iflashParameters FlashParameters::GetDefaults()
                 .calibrated = false,
                 .stepOffset = 0
             },
-        #if (ENABLE_DYNAMIC_CURRENT != 0 )
+        #if (ENABLE_DYNAMIC_CURRENT != false )
             .current = {
                 .accelCurrent = DYNAMIC_ACCEL_CURRENT,
                 .idleCurrent = DYNAMIC_IDLE_CURRENT,
@@ -36,7 +36,7 @@ iflashParameters FlashParameters::GetDefaults()
                 .enableInversion = false
             },
             
-        #ifdef ENABLE_PID
+        #if (ENABLE_PID == true)
             .pid = {
                 .P = DEFAULT_P,
                 .I = DEFAULT_I,
@@ -292,7 +292,7 @@ void FlashParameters::setFullStepAngle(float newStepAngle) {
     }
 }
 
-#if (ENABLE_DYNAMIC_CURRENT != 0)
+#if (ENABLE_DYNAMIC_CURRENT != false)
 uint16_t FlashParameters::getAccelCurrent() const{
     return mParameters.current.accelCurrent;
 }

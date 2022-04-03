@@ -125,7 +125,7 @@
     #define FIRMWARE_FEATURE_STALLFAULT    ""
 #endif
 
-#if (ENABLE_DYNAMIC_CURRENT != 0)
+#if (ENABLE_DYNAMIC_CURRENT != false)
     #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    "\nDynamic Current"
 #else
     #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    ""
@@ -180,7 +180,7 @@
 #define MICROSTEP_INTERVAL_CNT (uint16_t)(log2(MAX_MICROSTEP_DIVISOR) - log2(MIN_MICROSTEP_DIVISOR) + 1)
 
 // Throw errors if any of the encoder options are enabled while the encoder is disabled
-#if((ENABLE_ENCODER == false) && (defined(STEP_CORRECTION) || defined(ENABLE_PID) || defined(ENABLE_DYNAMIC_CURRENT)))
+#if((ENABLE_ENCODER == false) && (defined(STEP_CORRECTION) || (ENABLE_PID == true) || (ENABLE_DYNAMIC_CURRENT != false )))
 
     // TODO: Make this say the option conflicting
     #error "The encoder can't be disabled while any of the encoder features are enabled!"

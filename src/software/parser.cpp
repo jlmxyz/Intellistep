@@ -97,7 +97,7 @@ String parseCommand(String buffer) {
             }
             #endif
 
-            #ifdef ENABLE_PID
+            #if (ENABLE_PID == true)
             case 154: {
                 // M154 (ex M154) - Runs the manual PID tuning interface. Serial is filled with encoder angles
 

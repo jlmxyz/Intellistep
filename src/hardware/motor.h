@@ -135,7 +135,7 @@ class StepperMotor {
         int32_t getUnhandledStepCNT();
 
         // Dynamic current
-        #if (ENABLE_DYNAMIC_CURRENT != 0 )
+        #if (ENABLE_DYNAMIC_CURRENT != false )
 
         // Gets the acceleration factor for dynamic current
         uint16_t getDynamicAccelCurrent() const;
