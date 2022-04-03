@@ -491,21 +491,18 @@ void scheduleSteps(int64_t count, int32_t rate, STEP_DIR stepDir) {
 #if (defined(ENABLE_DIRECT_STEPPING) || (ENABLE_PID == true))
 // Handles a step schedule event
 void stepScheduleHandler() {
-
+    disableStepScheduleTimer();
     // Check if we should be worrying about remaining steps
     if (decrementRemainingSteps) {
-
+        
         // Increment the motor in the correct direction
-        motor.step(scheduledStepDir, motor.microstepMultiplier);
+        motor.step(scheduledStepDir, 1);
 
         // Increment the counter down (we completed a step)
         remainingScheduledSteps--;
 
         // Disable the timer if there are no remaining steps
         if (remainingScheduledSteps <= 0) {
-
-            // Pause the step timer (will be re-enabled by the PID loop)
-            disableStepScheduleTimer();
 
             // Resume the correctional timer if it is enabled
             if (stepCorrection) {
@@ -517,8 +514,7 @@ void stepScheduleHandler() {
         }
     }
     else {
-        // Just step the motor in the desired direction
-        motor.step(scheduledStepDir, 1);
+        enableStepScheduleTimer();
     }
 }
 
