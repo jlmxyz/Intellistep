@@ -272,13 +272,13 @@ float StepperMotor::getAngleError(double currentAbsAngle) {
 
 // Returns the step deviation of the motor from the desired step
 int32_t StepperMotor::getStepError() {
-    return (getDesiredStep() - round(encoder.getAbsoluteAngleAvg() / (this -> microstepAngle)));
+    return (getDesiredStep() - round(encoder.getAbsoluteAngleAvg() / getMicrostepAngle()));
 }
 
 
 // Returns the step deviation of the motor from the desired step
 int32_t StepperMotor::getStepError(double currentAbsAngle) {
-    return (getDesiredStep() - round(currentAbsAngle / (this -> microstepAngle)));
+    return (getDesiredStep() - round(currentAbsAngle / getMicrostepAngle()));
 }
 #endif // ENABLE_ENCODER
 
@@ -290,13 +290,13 @@ int32_t StepperMotor::getStepPhase() {
 
 // Returns the desired angle of the motor
 float StepperMotor::getDesiredAngle() {
-    return (microstepAngle * getActualStepCNT());
+    return (getMicrostepAngle() * getActualStepCNT());
 }
 
 
 // Sets the desired angle of the motor
 void StepperMotor::setDesiredAngle(float newDesiredAngle) {
-    setActualStepCNT(round(newDesiredAngle / microstepAngle));
+    setActualStepCNT(round(newDesiredAngle / getMicrostepAngle()));
 }
 
 
@@ -455,14 +455,18 @@ void StepperMotor::setPeakCurrent(uint16_t peakCurrent) {
 #endif // ! ENABLE_DYNAMIC_CURRENT
 
 // Get the microstepping divisor of the motor
-uint8_t StepperMotor::getMicrostepping() {
+uint8_t StepperMotor::getMicrostepping() const {
     return mParameters.getMicrostepping();
 }
 
 
 // Set the microstepping divisor of the motor
-void StepperMotor::setMicrostepping(uint8_t setMicrostepping, bool lock) {
+uint8_t StepperMotor::setMicrostepping(uint8_t setMicrostepping, bool lock) {
 
+    if (setMicrostepping != 1 && setMicrostepping != 2 && setMicrostepping != 4 && 
+        setMicrostepping != 8 && setMicrostepping != 16 && setMicrostepping != 32) {
+            return -1;
+        }
     // Make sure that the new value isn't a -1 (all functions that fail should return a -1)
     if (setMicrostepping != -1) {
 
@@ -470,7 +474,7 @@ void StepperMotor::setMicrostepping(uint8_t setMicrostepping, bool lock) {
         if (this -> microstepLocked && !lock) {
 
             // Nothing should be changed, exit the function
-            return;
+            return 0;
         }
 
         // Calculate the step scaling
@@ -489,17 +493,16 @@ void StepperMotor::setMicrostepping(uint8_t setMicrostepping, bool lock) {
         // Set the microstepping divisor
         mParameters.setMicrostepping(setMicrostepping);
 
-        // Fix the microstep angle
-        this -> microstepAngle = (mParameters.getFullStepAngle()) / (mParameters.getMicrostepping());
-
-        // Fix the microsteps per rotation
-        this -> microstepsPerRotation = round(360.0 / microstepAngle);
-
         // Fix the step to sine array factor
         this -> stepToSineArrayFactor = MAX_MICROSTEP_DIVISOR / setMicrostepping;
 
         // Set that the microstepping should be locked for future writes
         this -> microstepLocked = lock;
+
+        // Update the timer based on the new microstepping
+        updateCorrectionTimer();
+
+        return 0;
     }
 }
 
@@ -516,11 +519,6 @@ void StepperMotor::setFullStepAngle(float newStepAngle) {
             // Save the new full step angle
             mParameters.setFullStepAngle(newStepAngle);
 
-            // Fix the microstep angle
-            this -> microstepAngle = (mParameters.getFullStepAngle()) / (mParameters.getMicrostepping());
-
-            // Fix the microsteps per rotation
-            this -> microstepsPerRotation = round(360.0 / microstepAngle);
         }
     }
 }
@@ -534,13 +532,13 @@ float StepperMotor::getFullStepAngle() const {
 
 // Get the microstep angle of the motor
 float StepperMotor::getMicrostepAngle() const {
-    return (this -> microstepAngle);
+    return getFullStepAngle() / getMicrostepping();
 }
 
 
 // Get the microsteps per rotation of the motor
 int32_t StepperMotor::getMicrostepsPerRotation() const {
-    return (this -> microstepsPerRotation);
+    return (360.0 / getMicrostepAngle());
 }
 
 

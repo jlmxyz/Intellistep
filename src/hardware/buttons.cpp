@@ -145,8 +145,7 @@ void readDipMicrostepping() {
           motor.setMicrostepping(1, false);
       }
 
-      // Update the timer based on the new microstepping
-      updateCorrectionTimer();
+      
     }
 }
 

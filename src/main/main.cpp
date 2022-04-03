@@ -322,7 +322,8 @@ void loop() {
         // We should delay the time remaining in the loop
         // We can take the set time for a loop and subtract the already taken time from it
         // This helps to stabilize the IO updates
-        delay(MIN_IO_LOOP_TIME - (getCurrentMillis() - startTime)); // ! Maybe remove? This could make the updates much faster
+        int64_t timeToSleep(constrain(MIN_IO_LOOP_TIME - (getCurrentMillis() - startTime), 0, MIN_IO_LOOP_TIME));
+        delay(timeToSleep); // ! Maybe remove? This could make the updates much faster
     #endif
 }
 
