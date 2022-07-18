@@ -475,6 +475,7 @@ void scheduleSteps(int64_t count, int32_t rate, STEP_DIR stepDir) {
     #ifndef DISABLE_CORRECTION_TIMER
     correctionTimer -> pause();
     #endif
+    disableStepScheduleTimer();
     syncInstructions();
 
     // Set the count and step direction
@@ -511,6 +512,8 @@ void stepScheduleHandler() {
                 #endif
                 syncInstructions();
             }
+        } else {
+            enableStepScheduleTimer();
         }
     }
     else {
