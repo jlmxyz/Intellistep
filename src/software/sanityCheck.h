@@ -102,37 +102,37 @@
 
 // Firmware feature print definition
 #if (ENABLE_OLED != 0)
-    #define FIRMWARE_FEATURE_OLED     "\nOLED"
+    #define FIRMWARE_FEATURE_OLED     "OLED\n"
 #else
     #define FIRMWARE_FEATURE_OLED     ""
 #endif
 
 #if (ENABLE_SERIAL != 0)
-    #define FIRMWARE_FEATURE_SERIAL    "\nSerial"
+    #define FIRMWARE_FEATURE_SERIAL    "Serial\n"
 #else
     #define FIRMWARE_FEATURE_SERIAL    ""
 #endif
 
 #if (ENABLE_CAN != 0)
-    #define FIRMWARE_FEATURE_CAN    "\nCAN"
+    #define FIRMWARE_FEATURE_CAN    "CAN\n"
 #else
     #define FIRMWARE_FEATURE_CAN    ""
 #endif
 
 #ifdef ENABLE_STALLFAULT
-    #define FIRMWARE_FEATURE_STALLFAULT    "\nStallFault"
+    #define FIRMWARE_FEATURE_STALLFAULT    "StallFault\n"
 #else
     #define FIRMWARE_FEATURE_STALLFAULT    ""
 #endif
 
 #if (ENABLE_DYNAMIC_CURRENT != false)
-    #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    "\nDynamic Current"
+    #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    "Dynamic Current\n"
 #else
     #define FIRMWARE_FEATURE_DYNAMIC_CURRENT    ""
 #endif
 
 #ifdef ENABLE_OVERTEMP_PROTECTION
-    #define FIRMWARE_FEATURE_OVERTEMP_PROTECTION    "\nOvertemp Protection"
+    #define FIRMWARE_FEATURE_OVERTEMP_PROTECTION    "Overtemp Protection\n"
 #else
     #define FIRMWARE_FEATURE_OVERTEMP_PROTECTION    ""
 #endif

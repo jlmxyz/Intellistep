@@ -250,7 +250,7 @@ typedef float real_t;
 //#define ENABLE_STEPPING_VELOCITY
 //#define IGNORE_FLASH_VERSION
 #ifndef STEP_CORRECTION
-    //#define DISABLE_CORRECTION_TIMER
+    #define DISABLE_CORRECTION_TIMER
 #endif
 #define ENABLE_ENCODER true
 

@@ -77,7 +77,7 @@ void runSerialParser() {
     if (serialCommandBuffer != "-1") {
 
         // Send the feedback from the serial command 2 \n are considered as command delimiter
-        sendSerialMessage(parseCommand(serialCommandBuffer) + "\n\n");
+        sendSerialMessage(parseCommand(serialCommandBuffer) + "\n" + serialCommandBuffer + " _END_\n");
     }
 }
 

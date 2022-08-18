@@ -288,7 +288,7 @@ String FlashParameters::dumpParameters() {
                       "\"active\" : \"" + String(mParameters.DipSwitches.active) + "\"," +
                       "\"isDipInverted\" : \"" + String(mParameters.DipSwitches.isDipInverted) + "\"" +
                     "}," +
-                    "\"crc\" : \"" +  String(mParameters.crc) + "\",";
+                    "\"crc\" : \"" +  String(mParameters.crc) + "\"}\n";
     return res;
 }
 
